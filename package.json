@@ -1,0 +1,23 @@
+{
+  "name": "corrida-maluca-js",
+  "scripts": {
+    "start": "babel-node index.js",
+    "test": "jest",
+    "server": "nodemon server.js"
+  },
+  "devDependencies": {
+    "@babel/cli": "7.8.4",
+    "@babel/core": "7.6.2",
+    "@babel/node": "7.6.2",
+    "@babel/preset-env": "7.9.5"
+  },
+  "dependencies": {
+    "axios": "0.21.1",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "jest": "25.4.0",
+    "nodemon": "^2.0.21",
+    "pg": "^8.10.0",
+    "postgres": "^3.3.4"
+  }
+}
