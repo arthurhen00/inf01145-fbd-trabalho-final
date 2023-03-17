@@ -1,4 +1,4 @@
-const db = require('./server')
+const db = require('./db')
 
 async function createTabelas(){
 

@@ -1,4 +1,4 @@
-const db = require('./server')
+const db = require('./db')
 
 async function insertTabelas(){
 
@@ -81,13 +81,19 @@ async function insertTabelas(){
         ('usuario2', 4, 6),
         ('usuario3', 1, 0),
         ('usuario3', 2, 0),
-        ('usuario3', 3, 0)
+        ('usuario3', 3, 0),
+        ('usuario4', 1, 2),
+        ('usuario5', 1, 3),
+        ('usuario6', 1, 4)
     ` )
 
     await db.query( `insert into Pedido VALUES
         ('1', 726.88, '2021-09-12', 'usuario1'),
         ('2', 358.9, '2022-01-01', 'usuario2'),
-        ('3', 270.88, '2023-12-25', 'usuario3')
+        ('3', 270.88, '2023-12-25', 'usuario3'),
+        ('4', 129.90, '2023-12-25', 'usuario4'),
+        ('5', 129.90, '2023-12-25', 'usuario5'),
+        ('6', 129.90, '2023-12-25', 'usuario6')
     ` )
 
     await db.query( `insert into Conteudo VALUES
@@ -101,14 +107,18 @@ async function insertTabelas(){
         (4, 2),
         (1, 3),
         (2, 3),
-        (3, 3)
+        (3, 3),
+        (1, 4),
+        (1, 5),
+        (1, 6)
     ` )
 
     await db.query( `insert into Item VALUES
         (1, 'Cathedral of the Deep', 0.48, 'Steam-Carta Colecionável de DARK SOULS™ III-The Cathedral of the Deep', 4),
         (2, 'Lothric Castle', 0.5, 'Steam-Carta Colecionável de DARK SOULS™ III-Lothric Castle', 4),
         (3, 'Road of Sacrifices', 0.48, 'Steam-Carta Colecionável de DARK SOULS™ III-The Road of Sacrifices', 4),
-        (4, 'Undead Settlement', 0.48, 'Steam-Carta Colecionável de DARK SOULS™ III-The Undead Settlement', 4)
+        (4, 'Undead Settlement', 0.48, 'Steam-Carta Colecionável de DARK SOULS™ III-The Undead Settlement', 4),
+        (5, 'Moonlight Greatsword', 120.77, 'Obtida ao cortar a calda do Seath the Scaleless', 4)
     ` )
     
     await db.query( `insert into Inventario VALUES
@@ -118,7 +128,9 @@ async function insertTabelas(){
         ('usuario1', 4),
         ('usuario1', 4),
         ('usuario3', 1),
-        ('usuario3', 1)
+        ('usuario3', 1),
+        ('usuario1', 5),
+        ('usuario4', 5)
     ` )
 
     await db.query( `insert into Mercado VALUES

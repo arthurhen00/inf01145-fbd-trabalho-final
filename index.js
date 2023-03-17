@@ -46,6 +46,13 @@ const menuSteam = {
          * É possivel altera-las
          */
     },
+    "Minha biblioteca": async () => {
+        /**
+         * Listar meus jogos
+         * Posso entrar em jogo
+         * Jogar -> altera o tempo
+         */
+    },
     "Loja": async () => {
         /**
          * select da loja
