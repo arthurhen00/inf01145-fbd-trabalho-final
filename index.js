@@ -13,7 +13,6 @@ const menuInicial = {
     let loginValido = false
         const email = await useQuestion('Email: ')
         const senha = await useQuestion('Senha: ')
-        // select para ver se o email corresponde com a senha
 
         await axios.post('http://localhost:3001/login', {
             email: email,
@@ -30,11 +29,25 @@ const menuInicial = {
         } 
         
     },
-    "Registrar-se": () => {
+    "Registrar-se": async () => {
         /**
          * Adiciona um usuario (nao registrado) no db
          */
+        const login = await useQuestion('Login: ')
+        const email = await useQuestion('Email: ')
+        const senha = await useQuestion('Senha: ')
 
+        await axios.post('http://localhost:3001/registrar', {
+            login: login,
+            email: email,
+            senha: senha
+        }).then((res) => {
+            if(res.data){
+                console.log('\nCadastrado.')
+            } else {
+                console.log('\nLogin ou email em uso.')
+            }
+        })
     }
 }
 
@@ -71,6 +84,10 @@ const menuSteam = {
     },
     "Mercado da Comunidade": async () => {
         
+    },
+    "Sair": async () => {
+        login = null
+        menuAtual = menuInicial
     }
 }
 
@@ -82,6 +99,7 @@ const main = async () => {
 
     while(!sair){
         if(login){
+            console.clear()
             console.log('\nUsuário logado: ' + login)
         }
         console.log('\nEscolha uma das opções: ')
@@ -93,8 +111,10 @@ const main = async () => {
         const nomeAcao = opcoes[escolha-1]
         const acao = menuAtual[nomeAcao]
         if(!acao){
+            console.clear()
             console.log('\nOpção não encontrada.')
         } else {
+            console.clear()
             await acao()
         }
 
@@ -102,3 +122,5 @@ const main = async () => {
 }
 
 main()
+
+
