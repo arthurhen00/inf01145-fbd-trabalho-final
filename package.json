@@ -1,5 +1,5 @@
 {
-  "name": "corrida-maluca-js",
+  "name": "steam",
   "scripts": {
     "start": "babel-node index.js",
     "test": "jest",
