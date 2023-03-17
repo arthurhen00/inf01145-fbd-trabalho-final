@@ -6,29 +6,34 @@ let login = null
 
 const menuInicial = {
     "Login": async () => {
-        let loginValido = false
-        //do{
-            const email = await useQuestion('Email: ')
-            const senha = await useQuestion('Senha: ')
-            // select para ver se o email corresponde com a senha
+        /**
+         * Verifica as credenciais com o banco
+         * altera o menu
+         */
+    let loginValido = false
+        const email = await useQuestion('Email: ')
+        const senha = await useQuestion('Senha: ')
+        // select para ver se o email corresponde com a senha
 
-            await axios.post('http://localhost:3001/login', {
-                email: email,
-                senha: senha
-            }).then((res) => {
-                if(res.data.rows.length === 1){
-                    loginValido = true
-                    login = res.data.rows[0].login
-                    menuAtual = menuSteam
-                }
-            })
-            if(!loginValido){
-                console.log('\nLogin inválido.')
-            } 
-        //}while(!loginValido)
+        await axios.post('http://localhost:3001/login', {
+            email: email,
+            senha: senha
+        }).then((res) => {
+            if(res.data.rows.length === 1){
+                loginValido = true
+                login = res.data.rows[0].login
+                menuAtual = menuSteam
+            }
+        })
+        if(!loginValido){
+            console.log('\nLogin inválido.')
+        } 
         
     },
     "Registrar-se": () => {
+        /**
+         * Adiciona um usuario (nao registrado) no db
+         */
 
     }
 }
@@ -36,9 +41,18 @@ const menuInicial = {
 const menuSteam = {
 
     "Perfil": async () => {
-
+        /**
+         * Lista informações do usuario
+         * É possivel altera-las
+         */
     },
     "Loja": async () => {
+        /**
+         * select da loja
+         * é possivel comprar um jogo (adicionar a biblioteca do usuario)
+         * verifica se já possui o jogo
+         * desconta valor do jogo
+         */
         await axios.get('http://localhost:3001/loja', {
 
         }).then((res) => {
@@ -80,4 +94,4 @@ const main = async () => {
     }
 }
 
-//main()
+main()
