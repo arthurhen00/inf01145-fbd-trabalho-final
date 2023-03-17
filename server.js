@@ -51,9 +51,29 @@ app.post("/registrar", (req, res) => {
     })
 })
 
-app.get("/loja", (req, res) => {
-    db.query('SELECT * FROM jogos', 
-    (err, result) => {
-        res.send(result.rows)
-    })
+app.post("/loja", (req, res) => {
+
+    const { nome } = req.body
+    const { genero } = req.body
+
+    if(nome){
+        db.query('SELECT * FROM jogos WHERE nome ILIKE $1',
+        ['%'+nome+'%'], (err, result) => {
+            res.send(result.rows)
+        })
+    } else if(genero){
+        db.query('SELECT idjogo, jogos.nome, preco, datalancamento, idademinima FROM jogos natural join classificacao join genero using(idgenero) WHERE genero.nome ILIKE $1',
+        ['%'+genero+'%'], (err, result) => {
+            res.send(result.rows)
+        })
+    } else {
+        db.query('SELECT * FROM jogos', 
+        (err, result) => {
+            res.send(result.rows)
+        })
+    }
+})
+
+app.post("/add-carrinho", (req, res) => {
+
 })

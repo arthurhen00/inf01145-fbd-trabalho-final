@@ -68,16 +68,21 @@ const menuSteam = {
     },
     "Loja": async () => {
         /**
-         * select da loja
-         * é possivel comprar um jogo (adicionar a biblioteca do usuario)
-         * verifica se já possui o jogo
-         * desconta valor do jogo
+         * Opções:
+         * Listar jogos
+         * Listar jogos com o nome X
+         * Listar jogos com o genero X
+         * é possivel adicionar um jogo ao carrinho (pedido)
+         * nao deve ser possivel adicionar um jogo que já está no carrinho ou na biblioteca
          */
-        await axios.get('http://localhost:3001/loja', {
-
-        }).then((res) => {
-            console.log(res.data)
-        })
+        menuAtual = menuLoja
+    },
+    "Carrinho": async () => {
+        /**
+         * Opções:
+         * Remover
+         * Comprar
+         */
     },
     "Inventário": async () => {
 
@@ -91,10 +96,45 @@ const menuSteam = {
     }
 }
 
+const menuLoja = {
+    "Listar jogos": async () => {
+        await axios.post('http://localhost:3001/loja')
+        .then((res) => {
+            console.table(res.data)
+        })
+        const email = await useQuestion('Qual jogo você deseja adicionar ao carrinho?1 (ID): ')
+    },
+    "Listar jogos por nome: ": async () => {
+        const nome = await useQuestion('Nome do jogo: ')
+        
+        await axios.post('http://localhost:3001/loja', {
+            nome: nome
+        })
+        .then((res) => {
+            console.table(res.data)
+        })
+        const email = await useQuestion('Qual jogo você deseja adicionar ao carrinho?2 (ID): ')
+    },
+    "Listar jogos por genero: ": async () => {
+        const genero = await useQuestion('Genero do jogo: ')
+        
+        await axios.post('http://localhost:3001/loja', {
+            genero: genero
+        })
+        .then((res) => {
+            console.table(res.data)
+        })
+        const email = await useQuestion('Qual jogo você deseja adicionar ao carrinho?3 (ID): ')
+    },
+    "Voltar": () => {
+        menuAtual = menuSteam
+    }
+}
+
 let menuAtual = menuInicial
 
 const main = async () => {
-
+    console.clear()
     console.log('\nBem-vindo à Steam')
 
     while(!sair){
