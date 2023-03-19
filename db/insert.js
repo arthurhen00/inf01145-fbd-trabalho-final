@@ -17,7 +17,8 @@ async function insertTabelas(){
         (3, 'Ação'),
         (4, 'Aventura'),
         (5, 'RPG'),
-        (6, 'Corrida')
+        (6, 'Corrida'),
+        (7, 'Mundo Aberto')
     ` )
 
     await db.query( `insert into Classificacao VALUES
@@ -88,12 +89,12 @@ async function insertTabelas(){
     ` )
 
     await db.query( `insert into Pedido VALUES
-        ('1', 726.88, '2021-09-12', 'usuario1'),
-        ('2', 358.9, '2022-01-01', 'usuario2'),
-        ('3', 270.88, '2023-12-25', 'usuario3'),
-        ('4', 129.90, '2023-12-25', 'usuario4'),
-        ('5', 129.90, '2023-12-25', 'usuario5'),
-        ('6', 129.90, '2023-12-25', 'usuario6')
+        (1, 726.88, '2021-09-12', 'usuario1'),
+        (2, 358.9, '2022-01-01', 'usuario2'),
+        (3, 270.88, '2023-12-25', 'usuario3'),
+        (4, 129.90, '2023-12-25', 'usuario4'),
+        (5, 129.90, '2023-12-25', 'usuario5'),
+        (6, 129.90, '2023-12-25', 'usuario6')
     ` )
 
     await db.query( `insert into Conteudo VALUES
@@ -118,7 +119,10 @@ async function insertTabelas(){
         (2, 'Lothric Castle', 0.5, 'Steam-Carta Colecionável de DARK SOULS™ III-Lothric Castle', 4),
         (3, 'Road of Sacrifices', 0.48, 'Steam-Carta Colecionável de DARK SOULS™ III-The Road of Sacrifices', 4),
         (4, 'Undead Settlement', 0.48, 'Steam-Carta Colecionável de DARK SOULS™ III-The Undead Settlement', 4),
-        (5, 'Moonlight Greatsword', 120.77, 'Obtida ao cortar a calda do Seath the Scaleless', 4)
+        (5, 'Moonlight Greatsword', 120.77, 'Arma de dragão lendária associada a Seath, o descamado.', 4),
+        (6, 'Skull Lantern', 2.3, 'Seu principal objetivo é criar luz para uso em áreas escuras.', 1),
+        (7, 'Anel do Dragão Imponente', 12, 'Aumenta o poder de todas as feitiçarias e piromancias em 20%.', 1),
+        (8, 'Anel do Corte de Sangue', 4, 'Aumenta a resistência a sangramento em 400%.', 1)
     ` )
     
     await db.query( `insert into Inventario VALUES
@@ -143,8 +147,15 @@ async function insertTabelas(){
         de fire link ela não retorna respostas, alguém sabe o que fazer para ela falar?', 'usuario1', 1),
         (2, 'Corridas noturnas', 'a quantidade de policiais aumenta durante a noite?', 'usuario2', 5),
         (3, 'Modificação de armas', 'para subir o nivel da arma é necessario atingir uma quantidade de kills com ela', 'usuario3', 6),
-        (4, 'Modificação de veiculos', 'basta dirigir com o veiculo que ele ira subir de nivel', 'usuario3', 6)
+        (4, 'Modificação de veiculos', 'basta dirigir com o veiculo que ele ira subir de nivel', 'usuario3', 6),
+        (5, 'Tem algum macete para passar do Taurus Demon', 'Acabei de começar no jogo e estou tomando um pau pra esse chefe, alguem tem alguma dica?', 'usuario1', 1)
     ` )
+
+    await db.query(`insert into Comentario VALUES
+        (1, 1, 'usuario3', 'Não sei. Espero ter ajudado.'),
+        (2, 1, 'usuario2', 'Devolver a alma de Anastacia à sua gaiola a reanimará, reativando a fogueira do Santuário de Firelink. Sua língua também será restaurada, permitindo que o jogador converse com ela.'),
+        (3, 2, 'usuario1', 'Sim.');
+    `)
     
     console.log('Valores inseridos.')
     await db.end()

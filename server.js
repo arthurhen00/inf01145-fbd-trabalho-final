@@ -12,6 +12,16 @@ app.listen(3001, () => {
     console.log('*')
 })
 
+app.post("/perfil", (req, res) => {
+    
+    const { login } = req.body
+
+    db.query('SELECT * FROM usuario WHERE login = $1',
+    [login], (err, result) => {
+        res.send(result.rows)
+    })
+})
+
 app.post("/login", (req, res) => {
 
     const { email } = req.body
@@ -22,7 +32,7 @@ app.post("/login", (req, res) => {
         if(err){
             console.log(err)
         } else {
-            res.send(result)
+            res.send(result.rows)
         }
     })
 })
@@ -57,17 +67,17 @@ app.post("/loja", (req, res) => {
     const { genero } = req.body
 
     if(nome){
-        db.query('SELECT * FROM jogos WHERE nome ILIKE $1',
+        db.query(`SELECT idjogo, jogos.nome, preco, to_char(datalancamento, 'DD/MM/YYYY'), idademinima FROM jogos WHERE nome ILIKE $1`,
         ['%'+nome+'%'], (err, result) => {
             res.send(result.rows)
         })
     } else if(genero){
-        db.query('SELECT idjogo, jogos.nome, preco, datalancamento, idademinima FROM jogos natural join classificacao join genero using(idgenero) WHERE genero.nome ILIKE $1',
+        db.query(`SELECT idjogo, jogos.nome, preco, to_char(datalancamento, 'DD/MM/YYYY'), idademinima FROM jogos natural join classificacao join genero using(idgenero) WHERE genero.nome ILIKE $1`,
         ['%'+genero+'%'], (err, result) => {
             res.send(result.rows)
         })
     } else {
-        db.query('SELECT * FROM jogos', 
+        db.query(`SELECT idjogo, jogos.nome, preco, to_char(datalancamento, 'DD/MM/YYYY'), idademinima FROM jogos`, 
         (err, result) => {
             res.send(result.rows)
         })

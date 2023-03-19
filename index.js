@@ -18,9 +18,9 @@ const menuInicial = {
             email: email,
             senha: senha
         }).then((res) => {
-            if(res.data.rows.length === 1){
+            if(res.data.length === 1){
                 loginValido = true
-                login = res.data.rows[0].login
+                login = res.data[0].login
                 menuAtual = menuSteam
             }
         })
@@ -57,7 +57,23 @@ const menuSteam = {
         /**
          * Lista informações do usuario
          * É possivel altera-las
+         * Login, email, apelido*, nome*, pais*, saldo*
          */
+        await axios.post('http://localhost:3001/perfil', {
+            login: login
+        })
+        .then( async (res) => {
+            console.log('\nLogin: ' + res.data[0].login)
+            console.log('Email: ' + res.data[0].email)
+            console.log('Apelido: ' + res.data[0].apelido)
+            console.log('Nome: ' + res.data[0].nome)
+            console.log('País: ' + res.data[0].pais)
+            console.log('Saldo: ' + res.data[0].saldo)
+            const alterar = await useQuestion('\nDeseja alterar algo? (Y/N) ')
+            if(alterar.toUpperCase() === 'Y'){
+                menuAtual = menuPerfil
+            }
+        })
     },
     "Minha biblioteca": async () => {
         /**
@@ -96,13 +112,44 @@ const menuSteam = {
     }
 }
 
+const menuPerfil = {
+    "Apelido": async () => {
+        const novoApelido = await useQuestion('Novo apelido: ')
+    },
+    "Nome": async () => {
+        const novoApelido = await useQuestion('Novo nome: ')
+    },
+    "País": async () => {
+        const novoApelido = await useQuestion('Novo país: ')
+    },
+    "Saldo": async () => {
+        const novoApelido = await useQuestion('Quanto de saldo voce deseja adicionar? ')
+    },
+    "Voltar": () => {
+        menuAtual = menuSteam
+    }
+}
+
 const menuLoja = {
     "Listar jogos": async () => {
+        let listaJogos
+        let jogoSelecionado
+        let idSelecionado
+        let estaCarrinho
+        let estaBiblioteca
         await axios.post('http://localhost:3001/loja')
         .then((res) => {
-            console.table(res.data)
+            listaJogos = res.data
+            console.table(listaJogos)
         })
-        const email = await useQuestion('Qual jogo você deseja adicionar ao carrinho?1 (ID): ')
+        do{
+            idSelecionado = await useQuestion('\nQual jogo você deseja adicionar ao carrinho? (ID): ')
+            jogoSelecionado = Boolean(listaJogos.find(({ idjogo }) => idjogo == idSelecionado))
+            if(!jogoSelecionado){
+                console.log('\nID inválido.')
+            }
+        }while(!jogoSelecionado)
+        // adiciona ao carrinho aqui
     },
     "Listar jogos por nome: ": async () => {
         const nome = await useQuestion('Nome do jogo: ')
@@ -113,7 +160,7 @@ const menuLoja = {
         .then((res) => {
             console.table(res.data)
         })
-        const email = await useQuestion('Qual jogo você deseja adicionar ao carrinho?2 (ID): ')
+        const email = await useQuestion('Qual jogo você deseja adicionar ao carrinho? (ID): ')
     },
     "Listar jogos por genero: ": async () => {
         const genero = await useQuestion('Genero do jogo: ')
@@ -124,7 +171,7 @@ const menuLoja = {
         .then((res) => {
             console.table(res.data)
         })
-        const email = await useQuestion('Qual jogo você deseja adicionar ao carrinho?3 (ID): ')
+        const email = await useQuestion('Qual jogo você deseja adicionar ao carrinho? (ID): ')
     },
     "Voltar": () => {
         menuAtual = menuSteam
