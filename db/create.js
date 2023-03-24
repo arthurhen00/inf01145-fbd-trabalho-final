@@ -74,9 +74,9 @@ async function createTabelas(){
 
     await db.query(`CREATE TABLE Item(
         idItem SERIAL PRIMARY KEY,
-        nome VARCHAR(30) NOT NULL,
+        nome VARCHAR(120) NOT NULL,
         preco FLOAT NOT NULL,
-        descricao VARCHAR(256),
+        descricao VARCHAR(512),
         idJogo SERIAL NOT NULL,
         FOREIGN KEY (idJogo) REFERENCES Jogos(idJogo)
     )`)
