@@ -3,6 +3,7 @@ import axios from 'axios'
 
 let sair = false
 let login = null
+let dev = false
 
 const menuInicial = {
     "Login": async () => {
@@ -18,9 +19,10 @@ const menuInicial = {
             email: email,
             senha: senha
         }).then((res) => {
-            if(res.data.length === 1){
+            if(res.data[0].length === 1){
                 loginValido = true
-                login = res.data[0].login
+                login = res.data[0][0].login
+                dev = res.data[1]
                 menuAtual = menuSteam
             }
         })
@@ -75,6 +77,9 @@ const menuSteam = {
             }
         })
     },
+    "Menu de Desenvolvedor": async () => {
+        menuAtual = menuDesenvolvedor
+    },
     "Minha biblioteca": async () => {
         /**
          * Listar meus jogos
@@ -106,8 +111,25 @@ const menuSteam = {
     "Mercado da Comunidade": async () => {
         
     },
+    "Histórico de compras": async () => {
+        /**
+         * Menu com id e data dos pedido
+         * Escolher um id leva para os itens que estao nesse pedido
+         */
+        console.log('\nEsse é o seu histórico de compras:')
+
+        await axios.post('http://localhost:3001/meus-pedidos', {
+            login: login
+        })
+        .then(async (res) => {
+            console.table(res.data)
+        })
+
+        const idPedido = await useQuestion('Gostaria de ver as informações de qual pedido?')
+    },
     "Sair": async () => {
         login = null
+        dev = false
         menuAtual = menuInicial
     }
 }
@@ -126,6 +148,52 @@ const menuPerfil = {
         const novoApelido = await useQuestion('Quanto de saldo voce deseja adicionar? ')
     },
     "Voltar": () => {
+        menuAtual = menuSteam
+    }
+}
+
+const menuDesenvolvedor = {
+    "Listar quantidade de vendas de jogos do gênero:": async () => {
+        const genero = await useQuestion('Qual é o gênero do jogo?')
+
+        await axios.post('http://localhost:3001/vendas-genero', {
+            genero: genero
+        }).then((res) => {
+            console.table(res.data)
+        })
+
+        const placeHolder = await useQuestion('\nDigite algo para voltar')
+
+    },
+    "Listar usuário que nao se interessam por jogos do gênero:": async () => {
+        const genero = await useQuestion('Qual é o gênero do jogo?')
+
+        await axios.post('http://localhost:3001/desinteresse-genero', {
+            genero: genero
+        }).then((res) => {
+            console.table(res.data)
+        })
+
+        const placeHolder = await useQuestion('\nDigite algo para voltar')
+
+    },
+    "Listar usuários fanáticos pelo estúdio:": async () => {
+        const estudio = await useQuestion('Qual é o estúdio do jogo?')
+
+        await axios.post('http://localhost:3001/fa-estudio', {
+            estudio: estudio
+        }).then((res) => {
+            if(res.data.length != 0){
+                console.table(res.data)
+            } else {
+                console.log('\nNenhum usuário possui todos os jogos dessa desenvolvedora.')
+            }
+        })
+
+        const placeHolder = await useQuestion('\nDigite algo para voltar')
+
+    },
+    "Voltar": async () => {
         menuAtual = menuSteam
     }
 }
@@ -160,7 +228,7 @@ const menuLoja = {
         .then((res) => {
             console.table(res.data)
         })
-        const email = await useQuestion('Qual jogo você deseja adicionar ao carrinho? (ID): ')
+        const idJogo = await useQuestion('Qual jogo você deseja adicionar ao carrinho? (ID): ')
     },
     "Listar jogos por genero: ": async () => {
         const genero = await useQuestion('Genero do jogo: ')
@@ -171,7 +239,18 @@ const menuLoja = {
         .then((res) => {
             console.table(res.data)
         })
-        const email = await useQuestion('Qual jogo você deseja adicionar ao carrinho? (ID): ')
+        const idJogo = await useQuestion('Qual jogo você deseja adicionar ao carrinho? (ID): ')
+    },
+    "Listar jogos populares: ": async () => {
+        const vendas = await useQuestion('Quantidade mínima de vendas: ')
+
+        await axios.post('http://localhost:3001/loja/jogos-populares', {
+            vendas: vendas
+        })
+        .then((res) => {
+            console.table(res.data)
+        })
+        const idJogo = await useQuestion('Qual jogo você deseja adicionar ao carrinho? (ID): ')
     },
     "Voltar": () => {
         menuAtual = menuSteam
@@ -181,27 +260,36 @@ const menuLoja = {
 let menuAtual = menuInicial
 
 const main = async () => {
-    console.clear()
+    //console.clear()
     console.log('\nBem-vindo à Steam')
 
     while(!sair){
         if(login){
-            console.clear()
+            //console.clear()
             console.log('\nUsuário logado: ' + login)
         }
         console.log('\nEscolha uma das opções: ')
         const opcoes = Object.keys(menuAtual)
-        opcoes.forEach((item, index) => {
+
+        // Se NÃO for um desenvolvedor nao mostra o menu de dev
+        const opcoesFiltradas = opcoes.filter(item => {
+            if(!dev && item === 'Menu de Desenvolvedor'){
+                return false
+            }
+            return true
+        })
+
+        opcoesFiltradas.forEach((item, index) => {
             console.log(`${index+1}: ${item}`)
         })
         const escolha = await useQuestion('\nDigite a sua escolha: ')
-        const nomeAcao = opcoes[escolha-1]
+        const nomeAcao = opcoesFiltradas[escolha-1]
         const acao = menuAtual[nomeAcao]
         if(!acao){
-            console.clear()
+            //console.clear()
             console.log('\nOpção não encontrada.')
         } else {
-            console.clear()
+            //console.clear()
             await acao()
         }
 

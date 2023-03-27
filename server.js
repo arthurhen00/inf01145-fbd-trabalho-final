@@ -29,11 +29,22 @@ app.post("/login", (req, res) => {
 
     db.query('SELECT * FROM usuario WHERE email = $1 AND senha = $2',
     [email, senha], (err, result) => {
-        if(err){
-            console.log(err)
+        if(result.rows.length === 1){
+            db.query('SELECT * FROM desenvolvedor WHERE login = $1',
+            [result.rows[0].login], (err1, result1) => {
+                if(result1.rows.length === 1) {
+                    res.send([result.rows, true])
+                    console.log('desenvolvedor')
+                } else {
+                    res.send([result.rows, false])
+                    console.log('usuario')
+                }
+            })
         } else {
-            res.send(result.rows)
+            res.send([result.rows, false])
+            console.log('Login invalido')
         }
+        
     })
 })
 
@@ -84,6 +95,79 @@ app.post("/loja", (req, res) => {
     }
 })
 
-app.post("/add-carrinho", (req, res) => {
+app.post("/loja/jogos-populares", (req, res) => {
+    const { vendas } = req.body
 
+    db.query(`select jogos.idjogo, publicacao.estudio Estudio, jogos.nome Jogo from publicacao
+    natural join jogos
+    where jogos.idjogo in (select idjogo from publicacao 
+                            natural join biblioteca
+                            group by idjogo
+                            having count(idjogo) >= $1 )`,
+    [vendas], (err, result) => {
+        res.send(result.rows)
+    })
+
+})
+
+app.post("/vendas-genero", (req, res) => {
+    const { genero } = req.body
+
+    db.query(`select jogos.nome as Jogo, count(biblioteca.login) as Vendas from jogos
+                natural join biblioteca
+                natural join classificacao
+                join genero using (idGenero)
+                where genero.nome ILIKE $1
+                group by jogos.nome
+                order by jogos.nome`,
+                [genero], (err, result) => {
+                    res.send(result.rows)
+                })
+})
+
+app.post("/desinteresse-genero", (req, res) => {
+    const { genero } = req.body
+
+    db.query(`select distinct usuario.login, usuario.apelido, usuario.nome from usuario
+    natural left join biblioteca
+    left join classificacao using(idjogo)
+    left join genero using(idgenero)
+    where usuario.login not in (select distinct usuario.login from usuario
+                                natural join biblioteca
+                                join classificacao using(idjogo)
+                                join genero using(idgenero)
+                                  where genero.nome ILIKE $1)`,
+                                  [genero], (err, result) => {
+                                    res.send(result.rows)
+                                  })
+})
+
+app.post("/fa-estudio", (req, res) => {
+
+    const { estudio } = req.body
+
+    db.query(`select * from usuario
+                     where not exists (select login from biblioteca
+                     natural right join publicacao
+                     where estudio ILIKE $1
+                     and idjogo NOT IN (select idjogo from biblioteca
+                                        where login = usuario.login))`,
+    [estudio], (err, result) => {
+        res.send(result.rows)
+    })
+
+})
+
+app.post("/meus-pedidos", (req, res) => {
+
+    const { login } = req.body
+
+    db.query(`select * from pedido where login = $1`,
+    [login], (err, result) => {
+        res.send(result.rows)
+    })
+})
+
+app.post("/meus-pedidos/conteudo", (req, res) => {
+    
 })
