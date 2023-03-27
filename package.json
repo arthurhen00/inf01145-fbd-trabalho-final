@@ -3,7 +3,8 @@
   "scripts": {
     "start": "babel-node index.js",
     "test": "jest",
-    "server": "nodemon server.js"
+    "server": "nodemon server.js",
+    "dci": "node db/drop.js & node db/create.js & node db/insert.js"
   },
   "devDependencies": {
     "@babel/cli": "7.8.4",
