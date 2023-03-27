@@ -162,12 +162,35 @@ app.post("/meus-pedidos", (req, res) => {
 
     const { login } = req.body
 
-    db.query(`select * from pedido where login = $1`,
+    db.query(`select idpedido, to_char(data, 'DD/MM/YYYY') as data, precototal from pedido where login = $1`,
     [login], (err, result) => {
         res.send(result.rows)
     })
 })
 
+app.post("/meus-pedidos/validacao", (req, res) => {
+    const { login } = req.body
+    const { idPedido } = req.body
+
+    db.query(`select * from pedido where login = $1 and idpedido = $2`,
+    [login, idPedido], (err, result) => {
+        if(result.rows.length > 0){
+            res.send(true)
+        } else {
+            res.send(false)
+        }
+    })
+})
+
 app.post("/meus-pedidos/conteudo", (req, res) => {
-    
+
+    const { idPedido } = req.body
+
+    db.query(`select idpedido, jogos.nome, jogos.preco from pedido_conteudo
+                join jogos using (idjogo)
+                join usuario using (login)
+                where idpedido = $1`,
+    [idPedido], (err, result) => {
+        res.send(result.rows)
+    })
 })

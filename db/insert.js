@@ -4,6 +4,22 @@ async function insertTabelas(){
 
     await db.connect()
 
+    await db.query(`CREATE VIEW mercado_item_jogo AS
+    select mercado.login as anunciante, 
+           item.nome as nome_item, 
+           jogos.nome as jogo_do_item, 
+           mercado.preco as preco_anuncio, 
+           item.preco as preco_item from mercado
+    join item using (iditem)
+    join jogos using (idjogo);
+    `)
+
+    await db.query(`CREATE VIEW pedido_conteudo AS
+                    select idpedido, login, data, precototal, idjogo from pedido
+                    natural join conteudo
+                    order by idpedido;
+    `)
+
     await db.query( `insert into Jogos VALUES (1, 'Dark Souls REMASTERED', 129.90, '2018-05-23', 18)` )
     await db.query( `insert into Jogos VALUES (2, 'Dark Souls II', 60.99, '2014-04-25', 18)` )
     await db.query( `insert into Jogos VALUES (3, 'Dark Souls II: Scholar of the First Sin', 79.99, '2015-04-01', 18)` )

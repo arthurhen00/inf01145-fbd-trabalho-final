@@ -39,17 +39,20 @@ const menuInicial = {
         const email = await useQuestion('Email: ')
         const senha = await useQuestion('Senha: ')
 
-        await axios.post('http://localhost:3001/registrar', {
+        if(login.length > 0 && email.length > 0 && senha.length > 0){
+            await axios.post('http://localhost:3001/registrar', {
             login: login,
             email: email,
             senha: senha
-        }).then((res) => {
-            if(res.data){
-                console.log('\nCadastrado.')
-            } else {
-                console.log('\nLogin ou email em uso.')
-            }
-        })
+            }).then((res) => {
+                if(res.data){
+                    console.log('\nCadastrado.')
+                } else {
+                    console.log('\nLogin ou email em uso.')
+                }
+            })
+        }
+
     }
 }
 
@@ -121,11 +124,31 @@ const menuSteam = {
         await axios.post('http://localhost:3001/meus-pedidos', {
             login: login
         })
-        .then(async (res) => {
+        .then((res) => {
             console.table(res.data)
         })
 
         const idPedido = await useQuestion('Gostaria de ver as informações de qual pedido?')
+
+        await axios.post('http://localhost:3001/meus-pedidos/validacao', {
+            login: login,
+            idPedido: idPedido
+        })
+        .then((res) => {
+            if(res.data){
+                axios.post('http://localhost:3001/meus-pedidos/conteudo', {
+                    idPedido: idPedido
+                })
+                .then((res1) => {
+                    console.table(res1.data)
+                })
+            } else {
+                console.log('\nEsse pedido nao é seu!')
+            }
+        })
+
+        const placeHolder = await useQuestion('\nVoltar')
+
     },
     "Sair": async () => {
         login = null
@@ -139,13 +162,13 @@ const menuPerfil = {
         const novoApelido = await useQuestion('Novo apelido: ')
     },
     "Nome": async () => {
-        const novoApelido = await useQuestion('Novo nome: ')
+        const novoNome = await useQuestion('Novo nome: ')
     },
     "País": async () => {
-        const novoApelido = await useQuestion('Novo país: ')
+        const novoPais = await useQuestion('Novo país: ')
     },
     "Saldo": async () => {
-        const novoApelido = await useQuestion('Quanto de saldo voce deseja adicionar? ')
+        const novoSaldo = await useQuestion('Quanto de saldo voce deseja adicionar? ')
     },
     "Voltar": () => {
         menuAtual = menuSteam
