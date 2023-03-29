@@ -117,6 +117,13 @@ async function createTabelas(){
         FOREIGN KEY (login) REFERENCES usuario(login)
     )`)
 
+    await db.query(`CREATE TABLE Carrinho(
+        login VARCHAR(30) NOT NULL,
+        idJogo INT UNIQUE NOT NULL,
+        FOREIGN KEY (login) REFERENCES usuario(login),
+        FOREIGN KEY (idJogo) REFERENCES jogos(idjogo)
+    )`)
+
     console.log('Tabelas criadas.')
     await db.end()
 
