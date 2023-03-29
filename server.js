@@ -76,6 +76,38 @@ app.post("/perfil", (req, res) => {
     })
 })
 
+app.post("/alterar-informacoes", (req, res) => {
+
+    const { login } = req.body
+    const { novoApelido } = req.body
+    const { novoNome } = req.body
+    const { novoPais } = req.body
+    const { addSaldo } = req.body
+
+    if(novoApelido){
+        db.query(`update usuario set apelido = $1 where login = $2`,
+        [novoApelido, login], (err, result) => {
+            res.send('\nApelido alterado!')
+        })
+    } else if(novoNome) {
+        db.query(`update usuario set nome = $1 where login = $2`,
+        [novoNome, login], (err, result) => {
+            res.send('\nNome alterado!')
+        })
+    } else if(novoPais) {
+        db.query(`update usuario set pais = $1 where login = $2`,
+        [novoPais, login], (err, result) => {
+            res.send('\nPaís alterado!')
+        })
+    } else if(addSaldo){
+        db.query(`update usuario set saldo = saldo + $1 where login = $2`,
+        [addSaldo, login], (err, result) => {
+            res.send('\nSaldo adicionado!')
+        })
+    }
+
+})
+
 // Loja
 
 app.post("/loja", (req, res) => {

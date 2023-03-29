@@ -155,6 +155,7 @@ const menuSteam = {
             }
         }while(!pedidoSelecionado)
 
+        console.log('Informações do pedio ' + idSelecionado + ':')
         await axios.post('http://localhost:3001/meus-pedidos/conteudo', {
             idPedido: idSelecionado
         })
@@ -163,7 +164,7 @@ const menuSteam = {
         })
 
         const placeHolder = await useQuestion('\nVoltar')
-
+        console.clear()
     },
     "Minhas publicações": async () => {
 
@@ -182,15 +183,43 @@ const menuSteam = {
 const menuPerfil = {
     "Alterar apelido": async () => {
         const novoApelido = await useQuestion('Novo apelido: ')
+        await axios.post('http://localhost:3001/alterar-informacoes', {
+            novoApelido: novoApelido,
+            login: login
+        })
+        .then((res) => {
+            console.table(res.data)
+        })
     },
     "Alterar nome": async () => {
         const novoNome = await useQuestion('Novo nome: ')
+        await axios.post('http://localhost:3001/alterar-informacoes', {
+            novoNome: novoNome,
+            login: login
+        })
+        .then((res) => {
+            console.table(res.data)
+        })
     },
     "Alterar país": async () => {
         const novoPais = await useQuestion('Novo país: ')
+        await axios.post('http://localhost:3001/alterar-informacoes', {
+            novoPais: novoPais,
+            login: login
+        })
+        .then((res) => {
+            console.table(res.data)
+        })
     },
     "Adicionar saldo": async () => {
-        const novoSaldo = await useQuestion('Quanto de saldo voce deseja adicionar? ')
+        const addSaldo = await useQuestion('Quanto de saldo voce deseja adicionar? ')
+        await axios.post('http://localhost:3001/alterar-informacoes', {
+            addSaldo: addSaldo,
+            login: login
+        })
+        .then((res) => {
+            console.table(res.data)
+        })
     },
     "Voltar": () => {
         menuAtual = menuSteam
