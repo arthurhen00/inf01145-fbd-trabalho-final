@@ -317,7 +317,6 @@ const menuLoja = {
         })
         .then((res) => {
             console.clear()
-            console.log(res.data)
             if(res.data){
                 console.log('\n** Esse jogo já está na sua biblioteca ou carrinho **')
             } else {
@@ -378,6 +377,8 @@ const menuCarrinho = {
         let idSelecionado
         let jogoSelecionado
 
+        console.table(listaCarrinho)
+
         do{
              idSelecionado = await useQuestion('Qual jogo você deseja remover do carrinho? (ID): ')
              jogoSelecionado = Boolean(listaCarrinho.find(({ idjogo }) => idjogo == idSelecionado))
@@ -390,6 +391,7 @@ const menuCarrinho = {
             login: login,
             idJogo: idSelecionado
         }).then((res) => {
+            console.clear()
             console.log(res.data)
         })
 

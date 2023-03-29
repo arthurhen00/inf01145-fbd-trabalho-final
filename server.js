@@ -168,7 +168,7 @@ app.post("/remove-carrinho", (req, res) => {
 
     db.query(`delete from carrinho where login = $1 and idJogo = $2`, 
     [login, idJogo], (err, result) => {
-        res.send('\nJogo removido do carrinho!')
+        res.send('\n** Jogo removido do carrinho! **')
     })
 })
 
