@@ -231,6 +231,31 @@ app.post("/fa-estudio", (req, res) => {
 
 })
 
+// Biblioteca
+
+app.post("/minha-biblioteca", (req, res) => {
+
+    const { login } = req.body
+
+    db.query(`select idJogo, nome, horasjogadas from biblioteca natural join jogos where login = $1`,
+    [login], (err, result) => {
+        res.send(result.rows)
+    })
+
+})
+
+// Inventario
+
+
+
+// Mercado da Comunidade
+
+
+
+// Publicações
+
+
+
 // Historico de compras
 
 app.post("/meus-pedidos", (req, res) => {

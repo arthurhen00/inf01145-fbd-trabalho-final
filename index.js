@@ -107,7 +107,7 @@ const menuSteam = {
                 listaCarrinho = res.data
                 console.table(listaCarrinho)
             } else {
-                console.log('\nCarrinho vazio!')
+                console.log('\n** Carrinho vazio! **')
                 carrinhoVazio = true
             }
         })
@@ -121,6 +121,15 @@ const menuSteam = {
          * Posso entrar em jogo
          * Jogar -> altera o tempo
          */
+        console.log('Meus jogos:')
+        await axios.post('http://localhost:3001/minha-biblioteca', {
+            login:login
+        })
+        .then((res) => {
+            console.table(res.data)
+        })
+
+        const placeHolder = await useQuestion('\nQual jogo você deseja jogar? (ID)')
     },
     "Inventário": async () => {
 
@@ -166,7 +175,7 @@ const menuSteam = {
         const placeHolder = await useQuestion('\nVoltar')
         console.clear()
     },
-    "Minhas publicações": async () => {
+    "Discussões": async () => {
 
     },
     "Menu de Desenvolvedor": async () => {
@@ -297,8 +306,12 @@ const menuLoja = {
             idJogo: idSelecionado
         })
         .then((res) => {
+            console.clear()
+            console.log(res.data)
             if(res.data){
-                console.log('\nEsse jogo já está na sua biblioteca ou carrinho')
+                console.log('\n** Esse jogo já está na sua biblioteca ou carrinho **')
+            } else {
+                console.log('\n** Jogo adicionado ao carrinho! **')
             }
         })
 
