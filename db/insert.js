@@ -5,7 +5,8 @@ async function insertTabelas(){
     await db.connect()
 
     await db.query(`CREATE VIEW mercado_item_jogo AS
-    select mercado.login as anunciante, 
+    select mercado.login as anunciante,
+           item,iditem,
            item.nome as nome_item, 
            jogos.nome as jogo_do_item, 
            mercado.preco as preco_anuncio, 

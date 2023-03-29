@@ -250,7 +250,16 @@ app.post("/minha-biblioteca", (req, res) => {
 
 // Mercado da Comunidade
 
+app.get("/mercado-comunidade", (req, res) => {
 
+    db.query(`select jogo_do_item, iditem, nome_item, count(nome_item) as quantidade, min(preco_anuncio) as menor_preco_disponivel from mercado_item_jogo
+    group by nome_item, jogo_do_item, iditem
+    order by jogo_do_item, nome_item`,
+    (err, result) => {
+        res.send(result.rows)
+    })
+
+})
 
 // Publicações
 

@@ -126,7 +126,11 @@ const menuSteam = {
             login:login
         })
         .then((res) => {
-            console.table(res.data)
+            if(res.data.length > 0){
+                console.table(res.data)
+            } else {
+                console.log('\n** Sua biblioteca está vazia! **')
+            }
         })
 
         const placeHolder = await useQuestion('\nQual jogo você deseja jogar? (ID)')
@@ -136,6 +140,12 @@ const menuSteam = {
     },
     "Mercado da Comunidade": async () => {
         
+        await axios.get('http://localhost:3001/mercado-comunidade')
+        .then((res) => {
+            console.table(res.data)
+        })
+
+        const placeHolder = await useQuestion('\nEntrar no item (ID)')
     },
     "Histórico de compras": async () => {
         /**
