@@ -12,15 +12,7 @@ app.listen(3001, () => {
     console.log('*')
 })
 
-app.post("/perfil", (req, res) => {
-    
-    const { login } = req.body
-
-    db.query('SELECT * FROM usuario WHERE login = $1',
-    [login], (err, result) => {
-        res.send(result.rows)
-    })
-})
+// Janela de login
 
 app.post("/login", (req, res) => {
 
@@ -72,6 +64,20 @@ app.post("/registrar", (req, res) => {
     })
 })
 
+// Perfil
+
+app.post("/perfil", (req, res) => {
+    
+    const { login } = req.body
+
+    db.query('SELECT * FROM usuario WHERE login = $1',
+    [login], (err, result) => {
+        res.send(result.rows)
+    })
+})
+
+// Loja
+
 app.post("/loja", (req, res) => {
 
     const { nome } = req.body
@@ -120,6 +126,8 @@ app.post("/add-carrinho", (req, res) => {
     })
 })
 
+// Carrinho
+
 app.post("/remove-carrinho", (req, res) => {
     const { login } = req.body
     const { idJogo } = req.body
@@ -140,6 +148,8 @@ app.post("/listar-carrinho", (req, res) => {
         res.send(result.rows)
     })
 })
+
+// Menu Dev
 
 app.post("/vendas-genero", (req, res) => {
     const { genero } = req.body
@@ -188,6 +198,8 @@ app.post("/fa-estudio", (req, res) => {
     })
 
 })
+
+// Historico de compras
 
 app.post("/meus-pedidos", (req, res) => {
 

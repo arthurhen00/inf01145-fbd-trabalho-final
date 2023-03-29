@@ -12,7 +12,7 @@ const menuInicial = {
          * Verifica as credenciais com o banco
          * altera o menu
          */
-    let loginValido = false
+        let loginValido = false
         const email = await useQuestion('Email: ')
         const senha = await useQuestion('Senha: ')
 
@@ -30,7 +30,7 @@ const menuInicial = {
         if(!loginValido){
             console.log('\nLogin inválido.')
         } 
-        
+        console.clear()
     },
     "Registrar-se": async () => {
         /**
@@ -58,38 +58,26 @@ const menuInicial = {
 }
 
 const menuSteam = {
-
     "Perfil": async () => {
         /**
          * Lista informações do usuario
          * É possivel altera-las
          * Login, email, apelido*, nome*, pais*, saldo*
          */
+        console.log('Meu perfil:')
         await axios.post('http://localhost:3001/perfil', {
             login: login
         })
         .then( async (res) => {
-            console.log('\nLogin: ' + res.data[0].login)
+            console.log('Login: ' + res.data[0].login)
             console.log('Email: ' + res.data[0].email)
             console.log('Apelido: ' + res.data[0].apelido)
             console.log('Nome: ' + res.data[0].nome)
             console.log('País: ' + res.data[0].pais)
             console.log('Saldo: ' + res.data[0].saldo)
-            const alterar = await useQuestion('\nDeseja alterar algo? (Y/N) ')
-            if(alterar.toUpperCase() === 'Y'){
-                menuAtual = menuPerfil
-            }
+
+            menuAtual = menuPerfil
         })
-    },
-    "Menu de Desenvolvedor": async () => {
-        menuAtual = menuDesenvolvedor
-    },
-    "Minha biblioteca": async () => {
-        /**
-         * Listar meus jogos
-         * Posso entrar em jogo
-         * Jogar -> altera o tempo
-         */
     },
     "Loja": async () => {
         /**
@@ -110,6 +98,7 @@ const menuSteam = {
          * Comprar -> saldo -> remove do carrinho -> cria o pedido -> adiciona na lib
          */
         let carrinhoVazio = false
+        console.log('Meu carrinho:')
         await axios.post('http://localhost:3001/listar-carrinho', {
             login: login
         })
@@ -125,6 +114,13 @@ const menuSteam = {
         if(!carrinhoVazio){
             menuAtual = menuCarrinho
         }
+    },
+    "Minha biblioteca": async () => {
+        /**
+         * Listar meus jogos
+         * Posso entrar em jogo
+         * Jogar -> altera o tempo
+         */
     },
     "Inventário": async () => {
 
@@ -152,7 +148,7 @@ const menuSteam = {
         })
 
         do{
-            idSelecionado = await useQuestion('Gostaria de ver as informações de qual pedido?')
+            idSelecionado = await useQuestion('\nGostaria de ver as informações de qual pedido?')
             pedidoSelecionado = Boolean(listaPedido.find(({ idpedido }) => idpedido == idSelecionado))
             if(!pedidoSelecionado){
                 console.log('\nEsse pedido não é seu!.')
@@ -169,6 +165,12 @@ const menuSteam = {
         const placeHolder = await useQuestion('\nVoltar')
 
     },
+    "Minhas publicações": async () => {
+
+    },
+    "Menu de Desenvolvedor": async () => {
+        menuAtual = menuDesenvolvedor
+    },
     "Sair": async () => {
         login = null
         dev = false
@@ -178,16 +180,16 @@ const menuSteam = {
 }
 
 const menuPerfil = {
-    "Apelido": async () => {
+    "Alterar apelido": async () => {
         const novoApelido = await useQuestion('Novo apelido: ')
     },
-    "Nome": async () => {
+    "Alterar nome": async () => {
         const novoNome = await useQuestion('Novo nome: ')
     },
-    "País": async () => {
+    "Alterar país": async () => {
         const novoPais = await useQuestion('Novo país: ')
     },
-    "Saldo": async () => {
+    "Adicionar saldo": async () => {
         const novoSaldo = await useQuestion('Quanto de saldo voce deseja adicionar? ')
     },
     "Voltar": () => {
@@ -349,7 +351,7 @@ const menuCarrinho = {
 let menuAtual = menuInicial
 
 const main = async () => {
-    //console.clear()
+    console.clear()
     console.log('\nBem-vindo à Steam')
 
     while(!sair){
@@ -375,10 +377,10 @@ const main = async () => {
         const nomeAcao = opcoesFiltradas[escolha-1]
         const acao = menuAtual[nomeAcao]
         if(!acao){
-            //console.clear()
-            console.log('\nOpção não encontrada.')
+            console.clear()
+            console.log('\n** Opção não encontrada. **')
         } else {
-            //console.clear()
+            console.clear()
             await acao()
         }
 
