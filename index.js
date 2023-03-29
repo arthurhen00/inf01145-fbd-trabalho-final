@@ -4,6 +4,7 @@ import axios from 'axios'
 let sair = false
 let login = null
 let dev = false
+let listaCarrinho = null
 
 const menuInicial = {
     "Login": async () => {
@@ -103,10 +104,27 @@ const menuSteam = {
     },
     "Carrinho": async () => {
         /**
-         * Opções:
-         * Remover
-         * Comprar
+         * Lista o carrinho
+         * Opcao de finalizar compra
+         * Opcao para remover
+         * Comprar -> saldo -> remove do carrinho -> cria o pedido -> adiciona na lib
          */
+        let carrinhoVazio = false
+        await axios.post('http://localhost:3001/listar-carrinho', {
+            login: login
+        })
+        .then((res) => {
+            if(res.data.length > 0){
+                listaCarrinho = res.data
+                console.table(listaCarrinho)
+            } else {
+                console.log('\nCarrinho vazio!')
+                carrinhoVazio = true
+            }
+        })
+        if(!carrinhoVazio){
+            menuAtual = menuCarrinho
+        }
     },
     "Inventário": async () => {
 
@@ -119,32 +137,33 @@ const menuSteam = {
          * Menu com id e data dos pedido
          * Escolher um id leva para os itens que estao nesse pedido
          */
+        let idSelecionado
+        let pedidoSelecionado
+        let listaPedido
+
         console.log('\nEsse é o seu histórico de compras:')
 
         await axios.post('http://localhost:3001/meus-pedidos', {
             login: login
         })
         .then((res) => {
-            console.table(res.data)
+            listaPedido = res.data
+            console.table(listaPedido)
         })
 
-        const idPedido = await useQuestion('Gostaria de ver as informações de qual pedido?')
+        do{
+            idSelecionado = await useQuestion('Gostaria de ver as informações de qual pedido?')
+            pedidoSelecionado = Boolean(listaPedido.find(({ idpedido }) => idpedido == idSelecionado))
+            if(!pedidoSelecionado){
+                console.log('\nEsse pedido não é seu!.')
+            }
+        }while(!pedidoSelecionado)
 
-        await axios.post('http://localhost:3001/meus-pedidos/validacao', {
-            login: login,
-            idPedido: idPedido
+        await axios.post('http://localhost:3001/meus-pedidos/conteudo', {
+            idPedido: idSelecionado
         })
         .then((res) => {
-            if(res.data){
-                axios.post('http://localhost:3001/meus-pedidos/conteudo', {
-                    idPedido: idPedido
-                })
-                .then((res1) => {
-                    console.table(res1.data)
-                })
-            } else {
-                console.log('\nEsse pedido nao é seu!')
-            }
+            console.table(res.data)
         })
 
         const placeHolder = await useQuestion('\nVoltar')
@@ -153,6 +172,7 @@ const menuSteam = {
     "Sair": async () => {
         login = null
         dev = false
+        listaCarrinho = null
         menuAtual = menuInicial
     }
 }
@@ -240,7 +260,17 @@ const menuLoja = {
                 console.log('\nID inválido.')
             }
         }while(!jogoSelecionado)
-        // adiciona ao carrinho aqui
+        
+        await axios.post('http://localhost:3001/add-carrinho', {
+            login: login,
+            idJogo: idSelecionado
+        })
+        .then((res) => {
+            if(res.data){
+                console.log('\nEsse jogo já está na sua biblioteca ou carrinho')
+            }
+        })
+
     },
     "Listar jogos por nome: ": async () => {
         const nome = await useQuestion('Nome do jogo: ')
@@ -276,6 +306,42 @@ const menuLoja = {
         const idJogo = await useQuestion('Qual jogo você deseja adicionar ao carrinho? (ID): ')
     },
     "Voltar": () => {
+        menuAtual = menuSteam
+    }
+}
+
+const menuCarrinho = {
+    "Comprar": async () => {
+        /**
+         * Retira saldo,
+         * Remove do carrinho,
+         * Adiciona na biblioteca,
+         * Cria pedido
+         */
+        menuAtual = menuSteam
+    },
+    "Remover": async () => {
+        let idSelecionado
+        let jogoSelecionado
+
+        do{
+             idSelecionado = await useQuestion('Qual jogo você deseja remover do carrinho? (ID): ')
+             jogoSelecionado = Boolean(listaCarrinho.find(({ idjogo }) => idjogo == idSelecionado))
+            if(!jogoSelecionado){
+                console.log('\nEsse jogo não está no seu carrinho.')
+            }
+        }while(!jogoSelecionado)
+
+        await axios.post('http://localhost:3001/remove-carrinho', {
+            login: login,
+            idJogo: idSelecionado
+        }).then((res) => {
+            console.log(res.data)
+        })
+
+        menuAtual = menuSteam
+    },
+    "Sair": async () => {
         menuAtual = menuSteam
     }
 }

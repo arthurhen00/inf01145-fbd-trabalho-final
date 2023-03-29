@@ -110,6 +110,37 @@ app.post("/loja/jogos-populares", (req, res) => {
 
 })
 
+app.post("/add-carrinho", (req, res) => {
+    const { login } = req.body
+    const { idJogo } = req.body
+
+    db.query(`insert into carrinho values($1, $2)`,
+    [login, idJogo], (err, result) => {
+        res.send(err)
+    })
+})
+
+app.post("/remove-carrinho", (req, res) => {
+    const { login } = req.body
+    const { idJogo } = req.body
+
+    console.log(login, idJogo)
+
+    db.query(`delete from carrinho where login = $1 and idJogo = $2`, 
+    [login, idJogo], (err, result) => {
+        res.send('\nJogo removido do carrinho!')
+    })
+})
+
+app.post("/listar-carrinho", (req, res) => {
+    const { login } = req.body
+
+    db.query(`select idJogo, nome, preco from carrinho natural join jogos where login = $1`,
+    [login], (err, result) => {
+        res.send(result.rows)
+    })
+})
+
 app.post("/vendas-genero", (req, res) => {
     const { genero } = req.body
 
@@ -165,20 +196,6 @@ app.post("/meus-pedidos", (req, res) => {
     db.query(`select idpedido, to_char(data, 'DD/MM/YYYY') as data, precototal from pedido where login = $1`,
     [login], (err, result) => {
         res.send(result.rows)
-    })
-})
-
-app.post("/meus-pedidos/validacao", (req, res) => {
-    const { login } = req.body
-    const { idPedido } = req.body
-
-    db.query(`select * from pedido where login = $1 and idpedido = $2`,
-    [login, idPedido], (err, result) => {
-        if(result.rows.length > 0){
-            res.send(true)
-        } else {
-            res.send(false)
-        }
     })
 })
 
