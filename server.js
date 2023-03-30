@@ -172,6 +172,15 @@ app.post("/add-carrinho", (req, res) => {
     })
 })
 
+app.post("/get-saldo", (req, res) => {
+    const { login } = req.body
+    
+    db.query('select saldo from usuario where login = $1', [login], (err, result) => {
+        res.send(result.rows[0].saldo)
+    })
+
+})
+
 // Carrinho
 
 app.post("/remove-carrinho", (req, res) => {
@@ -248,12 +257,25 @@ app.post("/fa-estudio", (req, res) => {
 // Biblioteca
 
 app.post("/minha-biblioteca", (req, res) => {
-
     const { login } = req.body
 
     db.query(`select idJogo, nome, horasjogadas from biblioteca natural join jogos where login = $1`,
     [login], (err, result) => {
         res.send(result.rows)
+    })
+
+})
+
+app.post("/jogar", (req, res) => {
+    const { login } = req.body
+    const { idJogo } = req.body
+    const { horasJogadas } = req.body
+
+    db.query(`update biblioteca 
+                set horasJogadas = horasJogadas + $1 
+                where login = $2 and idJogo = $3`,
+    [horasJogadas, login, idJogo], (err, result) => {
+        res.send(`\n** Você jogou o jogo ${idJogo} por ${horasJogadas} horas! **`)
     })
 
 })

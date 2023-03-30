@@ -121,24 +121,47 @@ const menuSteam = {
          * Posso entrar em jogo
          * Jogar -> altera o tempo
          */
+        let listaBiblioteca
+        let idSelecionado
+        let jogoSelecionado
         console.log('Meus jogos:')
         await axios.post('http://localhost:3001/minha-biblioteca', {
             login:login
         })
         .then((res) => {
             if(res.data.length > 0){
-                console.table(res.data)
+                listaBiblioteca = res.data
+                console.table(listaBiblioteca)
             } else {
                 console.log('\n** Sua biblioteca está vazia! **')
             }
         })
 
-        const placeHolder = await useQuestion('\nQual jogo você deseja jogar? (ID)')
+        do{
+            idSelecionado = await useQuestion('\nQual jogo você deseja jogar? (ID)')
+            jogoSelecionado = Boolean(listaBiblioteca.find(({ idjogo }) => idjogo == idSelecionado))
+            if(!jogoSelecionado){
+                console.log('\nVocê nao possui esse jogo.')
+            }
+        }while(!jogoSelecionado)
+
+        const horasJogadas = await useQuestion('\nJogar por quantas horas?')
+
+        await axios.post('http://localhost:3001/jogar', {
+            login: login,
+            idJogo: idSelecionado,
+            horasJogadas: horasJogadas
+        })
+        .then((res) => {
+            console.clear()
+            console.log(res.data)
+        })
+
     },
     "Inventário": async () => {
 
     },
-    "Mercado da Comunidade": async () => {
+    "Mercado da comunidade": async () => {
         
         await axios.get('http://localhost:3001/mercado-comunidade')
         .then((res) => {
@@ -188,8 +211,14 @@ const menuSteam = {
     "Discussões": async () => {
 
     },
-    "Menu de Desenvolvedor": async () => {
+    "Virar desenvolvedor": async () => {
+
+    },
+    "Menu de desenvolvedor": async () => {
         menuAtual = menuDesenvolvedor
+    },
+    "Publicar jogo": async () => {
+
     },
     "Sair": async () => {
         login = null
@@ -333,46 +362,178 @@ const menuLoja = {
                     console.log('\n** Jogo adicionado ao carrinho! **')
                 }
             })
-
         } else {
             console.log("\n** Esse jogo já está na sua biblioteca! **")
         }
 
-
-
     },
     "Listar jogos por nome: ": async () => {
+        let listaJogos
+        let jogoSelecionado
+        let idSelecionado
+        let estaCarrinho
+        let estaBiblioteca
         const nome = await useQuestion('Nome do jogo: ')
         
         await axios.post('http://localhost:3001/loja', {
             nome: nome
         })
         .then((res) => {
-            console.table(res.data)
+            listaJogos = res.data
+            console.table(listaJogos)
         })
-        const idJogo = await useQuestion('Qual jogo você deseja adicionar ao carrinho? (ID): ')
+        
+        if(listaJogos.length > 0){
+            do{
+                idSelecionado = await useQuestion('\nQual jogo você deseja adicionar ao carrinho? (ID): ')
+                jogoSelecionado = Boolean(listaJogos.find(({ idjogo }) => idjogo == idSelecionado))
+                if(!jogoSelecionado){
+                    console.log('\nID inválido.')
+                }
+            }while(!jogoSelecionado)
+            
+            await axios.post('http://localhost:3001/add-carrinho-validacao', {
+                login: login,
+                idJogo: idSelecionado
+            })
+            .then((res) => {
+                estaBiblioteca = res.data
+            })
+    
+            console.clear()
+    
+            if(!estaBiblioteca){
+                await axios.post('http://localhost:3001/add-carrinho', {
+                    login: login,
+                    idJogo: idSelecionado
+                })
+                .then((res) => {
+                    if(res.data){
+                        console.log('\n** Esse jogo já está no seu carrinho **')
+                    } else {
+                        console.log('\n** Jogo adicionado ao carrinho! **')
+                    }
+                })
+            } else {
+                console.log("\n** Esse jogo já está na sua biblioteca! **")
+            }
+        } else {
+            console.clear()
+            console.log('\n** Nenhum jogo com esse nome encontrado! **');
+        }
+
     },
     "Listar jogos por genero: ": async () => {
+        let listaJogos
+        let jogoSelecionado
+        let idSelecionado
+        let estaCarrinho
+        let estaBiblioteca
         const genero = await useQuestion('Genero do jogo: ')
         
         await axios.post('http://localhost:3001/loja', {
             genero: genero
         })
         .then((res) => {
-            console.table(res.data)
+            listaJogos = res.data
+            console.table(listaJogos)
         })
-        const idJogo = await useQuestion('Qual jogo você deseja adicionar ao carrinho? (ID): ')
+        
+        if(listaJogos.length > 0){
+            do{
+                idSelecionado = await useQuestion('\nQual jogo você deseja adicionar ao carrinho? (ID): ')
+                jogoSelecionado = Boolean(listaJogos.find(({ idjogo }) => idjogo == idSelecionado))
+                if(!jogoSelecionado){
+                    console.log('\nID inválido.')
+                }
+            }while(!jogoSelecionado)
+            
+            await axios.post('http://localhost:3001/add-carrinho-validacao', {
+                login: login,
+                idJogo: idSelecionado
+            })
+            .then((res) => {
+                estaBiblioteca = res.data
+            })
+    
+            console.clear()
+    
+            if(!estaBiblioteca){
+                await axios.post('http://localhost:3001/add-carrinho', {
+                    login: login,
+                    idJogo: idSelecionado
+                })
+                .then((res) => {
+                    if(res.data){
+                        console.log('\n** Esse jogo já está no seu carrinho **')
+                    } else {
+                        console.log('\n** Jogo adicionado ao carrinho! **')
+                    }
+                })
+            } else {
+                console.log("\n** Esse jogo já está na sua biblioteca! **")
+            }
+        } else {
+            console.clear()
+            console.log('\n** Nenhum jogo com esse gênero encontrado! **');
+        }
+
     },
     "Listar jogos populares: ": async () => {
+        let listaJogos
+        let jogoSelecionado
+        let idSelecionado
+        let estaCarrinho
+        let estaBiblioteca
         const vendas = await useQuestion('Quantidade mínima de vendas: ')
 
         await axios.post('http://localhost:3001/loja/jogos-populares', {
             vendas: vendas
         })
         .then((res) => {
-            console.table(res.data)
+            listaJogos = res.data
+            console.table(listaJogos)
         })
-        const idJogo = await useQuestion('Qual jogo você deseja adicionar ao carrinho? (ID): ')
+        
+        if(listaJogos.length > 0){
+            do{
+                idSelecionado = await useQuestion('\nQual jogo você deseja adicionar ao carrinho? (ID): ')
+                jogoSelecionado = Boolean(listaJogos.find(({ idjogo }) => idjogo == idSelecionado))
+                if(!jogoSelecionado){
+                    console.log('\nID inválido.')
+                }
+            }while(!jogoSelecionado)
+            
+            await axios.post('http://localhost:3001/add-carrinho-validacao', {
+                login: login,
+                idJogo: idSelecionado
+            })
+            .then((res) => {
+                estaBiblioteca = res.data
+            })
+    
+            console.clear()
+    
+            if(!estaBiblioteca){
+                await axios.post('http://localhost:3001/add-carrinho', {
+                    login: login,
+                    idJogo: idSelecionado
+                })
+                .then((res) => {
+                    if(res.data){
+                        console.log('\n** Esse jogo já está no seu carrinho **')
+                    } else {
+                        console.log('\n** Jogo adicionado ao carrinho! **')
+                    }
+                })
+            } else {
+                console.log("\n** Esse jogo já está na sua biblioteca! **")
+            }
+        } else {
+            console.clear()
+            console.log('\n** Nenhum com essa quantidade de vendas encontrado! **');
+        }
+
     },
     "Voltar": () => {
         menuAtual = menuSteam
@@ -387,6 +548,13 @@ const menuCarrinho = {
          * Adiciona na biblioteca,
          * Cria pedido
          */
+        let saldo
+        await axios.post('http://localhost:3001/get-saldo', {
+            login: login
+        })
+        .then((res) => {
+            saldo = res.data
+        })
         menuAtual = menuSteam
     },
     "Remover": async () => {
@@ -434,7 +602,7 @@ const main = async () => {
 
         // Se NÃO for um desenvolvedor nao mostra o menu de dev
         const opcoesFiltradas = opcoes.filter(item => {
-            if(!dev && item === 'Menu de Desenvolvedor'){
+            if(!dev && (item === 'Menu de desenvolvedor' || item === 'Publicar jogo') || dev && item === 'Virar desenvolvedor'){
                 return false
             }
             return true
