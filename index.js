@@ -311,18 +311,34 @@ const menuLoja = {
             }
         }while(!jogoSelecionado)
         
-        await axios.post('http://localhost:3001/add-carrinho', {
+        await axios.post('http://localhost:3001/add-carrinho-validacao', {
             login: login,
             idJogo: idSelecionado
         })
         .then((res) => {
-            console.clear()
-            if(res.data){
-                console.log('\n** Esse jogo já está na sua biblioteca ou carrinho **')
-            } else {
-                console.log('\n** Jogo adicionado ao carrinho! **')
-            }
+            estaBiblioteca = res.data
         })
+
+        console.clear()
+
+        if(!estaBiblioteca){
+            await axios.post('http://localhost:3001/add-carrinho', {
+                login: login,
+                idJogo: idSelecionado
+            })
+            .then((res) => {
+                if(res.data){
+                    console.log('\n** Esse jogo já está no seu carrinho **')
+                } else {
+                    console.log('\n** Jogo adicionado ao carrinho! **')
+                }
+            })
+
+        } else {
+            console.log("\n** Esse jogo já está na sua biblioteca! **")
+        }
+
+
 
     },
     "Listar jogos por nome: ": async () => {

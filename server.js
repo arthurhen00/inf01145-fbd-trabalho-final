@@ -148,6 +148,20 @@ app.post("/loja/jogos-populares", (req, res) => {
 
 })
 
+app.post("/add-carrinho-validacao", (req, res) => {
+    const { login } = req.body
+    const { idJogo } = req.body
+
+    db.query(`select * from biblioteca where login = $1 and idJogo = $2`, 
+    [login, idJogo], (err, result) => {
+        if(result.rows.length === 0){
+            res.send(false)
+        } else {
+            res.send(true)
+        }
+    })
+})
+
 app.post("/add-carrinho", (req, res) => {
     const { login } = req.body
     const { idJogo } = req.body
