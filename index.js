@@ -198,11 +198,13 @@ const menuSteam = {
                         infoItem: infoItem
                     })
                     .then((res) => {
+                        console.clear()
                         console.log(res.data)
                     })
 
-                } 
-                console.clear()
+                } else {
+                    console.clear()
+                }
             } else {
                 console.log('\n** Invetário vazio **')
             }
@@ -247,10 +249,11 @@ const menuSteam = {
             do{
                 idSelecionado = await useQuestion('\nSelecione qual anuncio você deseja comprar: (ID)')
                 itemSelecionado = Boolean(listaItens.find(({ idanuncio }) => idanuncio == idSelecionado))
-                precoAnuncio = listaItens.find(({ idanuncio }) => idanuncio == idSelecionado).preco_anuncio
-                anunciante = listaItens.find(({ idanuncio }) => idanuncio == idSelecionado).anunciante
                 if(!itemSelecionado){
                     console.log('\n** Não existe esse anúncio! **.')
+                } else {
+                    precoAnuncio = listaItens.find(({ idanuncio }) => idanuncio == idSelecionado).preco_anuncio
+                    anunciante = listaItens.find(({ idanuncio }) => idanuncio == idSelecionado).anunciante
                 }
             }while(!itemSelecionado)
 
@@ -278,6 +281,8 @@ const menuSteam = {
                     console.log(res.data)
                 })
             }
+        } else {
+            console.clear()
         }
     },
     "Histórico de compras": async () => {
