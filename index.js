@@ -435,6 +435,7 @@ const menuDiscussoes = {
             descricao: descricao
         })
         .then((res) => {
+            console.clear()
             console.log(res.data)
         })
 
