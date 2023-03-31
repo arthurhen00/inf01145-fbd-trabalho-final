@@ -2,3 +2,4 @@ Alterações feitas durante a construção da aplicação:
 
 * tabela carrinho criada para salvar um estado volatil do carrinho
 * id do item adicionado na view mercado_item_jogo
+* Sequencias foram criadas

@@ -125,6 +125,8 @@ async function createTabelas(){
         FOREIGN KEY (idJogo) REFERENCES jogos(idjogo)
     )`)
 
+    await db.query(`CREATE SEQUENCE pedido_seq START 15`)
+
     console.log('Tabelas criadas.')
     await db.end()
 

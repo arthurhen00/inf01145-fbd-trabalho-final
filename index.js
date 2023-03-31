@@ -186,27 +186,32 @@ const menuSteam = {
         })
         .then((res) => {
             listaPedido = res.data
+        })
+
+        if(listaPedido.length > 0){
             console.table(listaPedido)
-        })
+            do{
+                idSelecionado = await useQuestion('\nGostaria de ver as informações de qual pedido?')
+                pedidoSelecionado = Boolean(listaPedido.find(({ idpedido }) => idpedido == idSelecionado))
+                if(!pedidoSelecionado){
+                    console.log('\nEsse pedido não é seu!.')
+                }
+            }while(!pedidoSelecionado)
+    
+            console.log('Informações do pedio ' + idSelecionado + ':')
+            await axios.post('http://localhost:3001/meus-pedidos/conteudo', {
+                idPedido: idSelecionado
+            })
+            .then((res) => {
+                console.table(res.data)
+            })
+    
+            const placeHolder = await useQuestion('\nEnter para voltar')
+            console.clear()
+        } else {
+            console.log('** Você não possui um histórico de compras! **')
+        }
 
-        do{
-            idSelecionado = await useQuestion('\nGostaria de ver as informações de qual pedido?')
-            pedidoSelecionado = Boolean(listaPedido.find(({ idpedido }) => idpedido == idSelecionado))
-            if(!pedidoSelecionado){
-                console.log('\nEsse pedido não é seu!.')
-            }
-        }while(!pedidoSelecionado)
-
-        console.log('Informações do pedio ' + idSelecionado + ':')
-        await axios.post('http://localhost:3001/meus-pedidos/conteudo', {
-            idPedido: idSelecionado
-        })
-        .then((res) => {
-            console.table(res.data)
-        })
-
-        const placeHolder = await useQuestion('\nVoltar')
-        console.clear()
     },
     "Discussões": async () => {
 
@@ -282,6 +287,7 @@ const menuDesenvolvedor = {
             genero: genero
         }).then((res) => {
             console.table(res.data)
+            console.log(res.data)
         })
 
         const placeHolder = await useQuestion('\nDigite algo para voltar')
@@ -549,12 +555,50 @@ const menuCarrinho = {
          * Cria pedido
          */
         let saldo
+        let carrinhoVazio
         await axios.post('http://localhost:3001/get-saldo', {
             login: login
         })
         .then((res) => {
-            saldo = res.data
+            saldo = res.data[0].saldo
         })
+
+        await axios.post('http://localhost:3001/listar-carrinho', {
+            login: login
+        })
+        .then((res) => {
+            if(res.data.length > 0){
+                listaCarrinho = res.data
+            } else {
+                carrinhoVazio = true
+            }
+        })
+
+        let precoTotal = 0
+        let idJogos = []
+        listaCarrinho.forEach((item) => {
+            precoTotal += item.preco
+            idJogos.push(item.idjogo)
+        })
+
+        console.log(saldo, precoTotal, idJogos)
+
+        if(precoTotal > saldo) {
+            console.log(`\n** Saldo insuficiente! Saldo disponível: ${saldo}; Total: ${precoTotal} **`)
+        } else {
+                
+            await axios.post('http://localhost:3001/cria-pedido', {
+                precoTotal: precoTotal,
+                login: login,
+                idJogos: idJogos
+            })
+            .then((res) => {
+                console.log(res.data)
+            })
+        }
+
+        
+
         menuAtual = menuSteam
     },
     "Remover": async () => {

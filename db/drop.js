@@ -20,6 +20,8 @@ async function dropTabelas(){
     await db.query('drop table if exists Comentario CASCADE')
     await db.query('drop table if exists Carrinho CASCADE')
 
+    await db.query('drop sequence if exists pedido_seq CASCADE')
+
     console.log('Tabelas removidas.')
     await db.end()
 

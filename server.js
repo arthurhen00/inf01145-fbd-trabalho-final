@@ -172,22 +172,11 @@ app.post("/add-carrinho", (req, res) => {
     })
 })
 
-app.post("/get-saldo", (req, res) => {
-    const { login } = req.body
-    
-    db.query('select saldo from usuario where login = $1', [login], (err, result) => {
-        res.send(result.rows[0].saldo)
-    })
-
-})
-
 // Carrinho
 
 app.post("/remove-carrinho", (req, res) => {
     const { login } = req.body
     const { idJogo } = req.body
-
-    console.log(login, idJogo)
 
     db.query(`delete from carrinho where login = $1 and idJogo = $2`, 
     [login, idJogo], (err, result) => {
@@ -202,6 +191,60 @@ app.post("/listar-carrinho", (req, res) => {
     [login], (err, result) => {
         res.send(result.rows)
     })
+})
+
+app.post("/get-saldo", (req, res) => {
+    const { login } = req.body
+    
+    db.query('select saldo from usuario where login = $1', 
+    [login], (err, result) => {
+        res.send(result.rows)
+    })
+
+})
+
+app.post("/cria-pedido", (req, res) => {
+    const { precoTotal } = req.body
+    const { login } = req.body
+    const { idJogos } = req.body
+    let idPedido
+    
+    // Cria o pedido
+    db.query(`insert into pedido values( nextval('pedido_seq'), $1, current_timestamp, $2 )`, [precoTotal, login])
+
+    // Atualiza o saldo
+    db.query(`update usuario set saldo = saldo - $1 where login = $2`, [precoTotal, login])
+
+    //Limpa o carrinho
+    db.query(`delete from carrinho where login = $1`, [login])
+
+    // Pega o id pedido gerado
+    db.query(`select last_value from pedido_seq`, (err, result) => {
+        idPedido = result.rows[0].last_value
+    
+        idJogos.forEach((id) => {
+            console.log('tabela conteudo | idpedido: ' + idPedido, 'idjogo: ', id)
+            // Cria uma relação entre idPedido e idJogo
+            db.query(`insert into conteudo values( $1, $2 )`, [id, idPedido])
+    
+            // Atualiza biblioteca
+            db.query(`insert into biblioteca values ( $1, $2, $3 )`, [login, id, 0])
+        })
+    })
+
+    
+
+    res.send('\n** Pedido finalizado! **')
+})
+
+app.post("/cria-conteudo", (req, res) => {
+    const { idJogos } = req.body
+    let idPedido
+
+    
+
+    
+
 })
 
 // Menu Dev
