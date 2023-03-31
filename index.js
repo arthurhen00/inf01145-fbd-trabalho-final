@@ -406,7 +406,7 @@ const menuSteam = {
         menuAtual = menuDesenvolvedor
     },
     "Publicar jogo": async () => {
-
+        
     },
     "Sair": async () => {
         login = null
@@ -418,9 +418,25 @@ const menuSteam = {
 
 const menuDiscussoes = {
     "Listar discussões dos meus jogos": async () => {
-
+        await axios.post('http://localhost:3001/get-discussoes/meus-jogos', {
+            login: login
+        })
+        .then((res) => {
+            console.table(res.data, ['idpostagem', 'titulo'])
+        })
     },
     "Criar uma discussão": async () => {
+        const titulo = await useQuestion('\nTítulo da sua discussão:')
+        const descricao = await useQuestion('\nDescrição da sua discussão:')
+
+        await axios.post('http://localhost:3001/add-discussao', {
+            login: login,
+            titulo: titulo,
+            descricao: descricao
+        })
+        .then((res) => {
+            console.log(res.data)
+        })
 
     },
     "Voltar": async () => {

@@ -410,6 +410,31 @@ app.post("/add-comentario", (req, res) => {
     })
 })
 
+app.post("/get-discussoes/meus-jogos", (req, res) => {
+    const { login } = req.body
+
+    db.query(`select idpostagem, titulo, mensagem, comentario from discussoes
+    left join comentario using (idpostagem)
+    where discussoes.idjogo IN (select idjogo from usuario
+                                natural join biblioteca
+                                where usuario.login = $1)`,
+    [login], (err, result) => {
+        res.send(result.rows)
+    })
+})
+
+app.post("/add-discussao", (req, res) => {
+    const { login } = req.body
+    const { titulo } = req.body
+    const { descricao } = req.body
+
+    db.query(`insert into discussoes values ( nextval('discussao_seq'), $1, $2, $3 )`,
+    [titulo, descricao, login], (err, result) => {
+        res.send('\n** Tópico criado! **')
+    })
+    // 
+})
+
 // Historico de compras
 
 app.post("/meus-pedidos", (req, res) => {
