@@ -232,19 +232,7 @@ app.post("/cria-pedido", (req, res) => {
         })
     })
 
-    
-
     res.send('\n** Pedido finalizado! **')
-})
-
-app.post("/cria-conteudo", (req, res) => {
-    const { idJogos } = req.body
-    let idPedido
-
-    
-
-    
-
 })
 
 // Menu Dev
@@ -325,7 +313,29 @@ app.post("/jogar", (req, res) => {
 
 // Inventario
 
+app.post("/get-inventario", (req, res) => {
+    const { login } = req.body
 
+    db.query(`select iditem, item.nome, count(iditem) as quantidade, min(preco) as valor_recomendado from inventario
+            natural join item
+            join usuario using (login)
+            where usuario.login = $1
+            group by iditem, item.nome
+            order by item.nome`,
+    [login], (err, result) => {
+        res.send(result.rows)
+    })
+})
+
+app.post("/cria-anuncio", (req, res) => {
+    const { login } = req.body
+    const { valor } = req.body
+    const { infoItem } = req.body
+
+    db.query(`insert into mercado values ( nextval('anuncio_seq'), $1, $2, $3 )`, [infoItem.iditem, login, valor])
+
+    res.send(`\n** Você criou um anuncio para o item [${infoItem.nome}] no valor de [${valor}] **`)
+})
 
 // Mercado da Comunidade
 

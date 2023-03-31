@@ -158,8 +158,56 @@ const menuSteam = {
         })
 
     },
-    "Inventário": async () => {
+    "Meu inventário": async () => {
+        /**
+         * Listar meu inventario
+         * Deseja anunciar um item (Y/N)
+         * selecione o ID do item
+         * Gatilho aqui
+         * atualiza o mercado -> remove do inventario
+         */
+        let idSelecionado
+        let listaInventario
+        let itemSelecionado
+        let infoItem
+        await axios.post('http://localhost:3001/get-inventario', {
+            login: login
+        })
+        .then( async (res) => {
+            if(res.data.length > 0){
+                console.log('\nSeu inventário:')
+                listaInventario = res.data
+                console.table(listaInventario)
+                
+                const placeHolder = await useQuestion('\nDeseja anunciar um item? (Y/N)')
+                if(placeHolder.toUpperCase() === 'Y'){
+                    do{
+                        idSelecionado = await useQuestion('\nSelecione o item: (ID)')
+                        itemSelecionado = Boolean(listaInventario.find(({ iditem }) => iditem == idSelecionado))
+                        infoItem = listaInventario.find(({ iditem }) => iditem == idSelecionado)
+                        if(!itemSelecionado){
+                            console.log('\n** Você nao possui esse item! **.')
+                        }
+                    }while(!itemSelecionado)
 
+                    const precoAnuncio = await useQuestion(`\nAdicione um valor para o item [${infoItem.nome}] | Valor sugerido: [${infoItem.valor_recomendado}] reais`)
+
+                    await axios.post('http://localhost:3001/cria-anuncio', {
+                        login: login,
+                        valor: precoAnuncio,
+                        infoItem: infoItem
+                    })
+                    .then((res) => {
+                        
+                        console.log(res.data)
+                    })
+
+                } 
+                console.clear()
+            } else {
+                console.log('\n** Invetário vazio **')
+            }
+        })
     },
     "Mercado da comunidade": async () => {
         
@@ -168,7 +216,7 @@ const menuSteam = {
             console.table(res.data)
         })
 
-        const placeHolder = await useQuestion('\nEntrar no item (ID)')
+        const placeHolder = await useQuestion('\nDeseja comprar um item? (Y/N)')
     },
     "Histórico de compras": async () => {
         /**
@@ -581,8 +629,6 @@ const menuCarrinho = {
             idJogos.push(item.idjogo)
         })
 
-        console.log(saldo, precoTotal, idJogos)
-
         if(precoTotal > saldo) {
             console.log(`\n** Saldo insuficiente! Saldo disponível: ${saldo}; Total: ${precoTotal} **`)
         } else {
@@ -655,6 +701,7 @@ const main = async () => {
         opcoesFiltradas.forEach((item, index) => {
             console.log(`${index+1}: ${item}`)
         })
+
         const escolha = await useQuestion('\nDigite a sua escolha: ')
         const nomeAcao = opcoesFiltradas[escolha-1]
         const acao = menuAtual[nomeAcao]
@@ -670,5 +717,3 @@ const main = async () => {
 }
 
 main()
-
-
