@@ -418,7 +418,7 @@ app.post("/mercado-comunidade/item", (req, res) => {
 // Discussões
 
 app.get("/get-discussoes", (req, res) => {
-    db.query(`select * from discussoes order by titulo`,
+    db.query(`select * from discussoes order by idpostagem`,
     (err, result) => {
         res.send(result.rows)
     })

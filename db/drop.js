@@ -4,6 +4,9 @@ async function dropTabelas(){
 
     await db.connect()
 
+    await db.query('drop view if exists mercado_item_jogo CASCADE')
+    await db.query('drop view if exists pedido_conteudo CASCADE')
+
     await db.query('drop table if exists Inventario CASCADE')
     await db.query('drop table if exists Conteudo CASCADE')
     await db.query('drop table if exists Publicacao CASCADE')
