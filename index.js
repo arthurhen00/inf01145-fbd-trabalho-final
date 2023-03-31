@@ -423,7 +423,46 @@ const menuSteam = {
         menuAtual = menuDesenvolvedor
     },
     "Publicar jogo": async () => {
-        
+        let listaGenero
+        let idSelecionado
+        let generoSelecionado
+        const nomeJogo = await useQuestion('\nNome do jogo: ')
+        const valor = await useQuestion('\nPreço do jogo: ')
+        const idadeMinima = await useQuestion('\nIdade mínima do jogo: ')
+
+        await axios.get('http://localhost:3001/publicar-jogo/genero')
+        .then((res) => {
+            console.log('Escolha os gêneros do seu jogo: (ID)')
+            listaGenero = res.data
+            console.table(listaGenero)
+        })
+
+        let generosEscolhidos = []
+        do{
+            idSelecionado = await useQuestion('\nEscolha os gêneros do seu jogo: (ID) | ["done" para finalizar]: ')
+            generoSelecionado = Boolean(listaGenero.find(({ idgenero }) => idgenero == idSelecionado))
+            if(!generoSelecionado){
+                console.log('\n** ID inválido. **')
+            } else {
+                if(!Boolean(generosEscolhidos.find( function(id){ return id === idSelecionado } )) ){
+                    generosEscolhidos.push(idSelecionado)
+                } else {
+                    console.log('\nVocê já escolheu esse gênero')
+                }
+            }
+        }while(idSelecionado.toUpperCase() != 'DONE')
+
+        await axios.post('http://localhost:3001/publicar-jogo', {
+            nomeJogo: nomeJogo,
+            valor: valor,
+            idadeMinima: idadeMinima,
+            login: login,
+            generos: generosEscolhidos
+        })
+        .then((res) => {
+            console.clear()
+            console.log(res.data)
+        })
     },
     "Sair": async () => {
         login = null
@@ -515,11 +554,16 @@ const menuDesenvolvedor = {
         await axios.post('http://localhost:3001/vendas-genero', {
             genero: genero
         }).then((res) => {
-            console.table(res.data)
-            console.log(res.data)
+            if(res.data.length > 0){
+                console.log(`\nJogos do gênero: ${genero}`)
+                console.table(res.data)
+            } else {
+                console.log(`\n** Nenhum jogo do gênero ${genero} encontrado! **`)
+            }
         })
 
-        const placeHolder = await useQuestion('\nDigite algo para voltar')
+        const placeHolder = await useQuestion('\nEnter para voltar')
+        console.clear()
 
     },
     "Listar usuário que nao se interessam por jogos do gênero:": async () => {
@@ -528,11 +572,16 @@ const menuDesenvolvedor = {
         await axios.post('http://localhost:3001/desinteresse-genero', {
             genero: genero
         }).then((res) => {
-            console.table(res.data)
+            if(res.data.length > 0){
+                console.log(`\nUsuário que já compraram jogos do gênero: ${genero}`)
+                console.table(res.data)
+            } else {
+                console.log(`\n** Nenhum usuário comprou jogos do gênero ${genero}! **`)
+            }
         })
 
-        const placeHolder = await useQuestion('\nDigite algo para voltar')
-
+        const placeHolder = await useQuestion('\nEnter para voltar')
+        console.clear()
     },
     "Listar usuários fanáticos pelo estúdio:": async () => {
         const estudio = await useQuestion('Qual é o estúdio do jogo?')
@@ -541,14 +590,55 @@ const menuDesenvolvedor = {
             estudio: estudio
         }).then((res) => {
             if(res.data.length != 0){
+                console.log(`\nUsuários que compraram todos os jogos publicados pela desenvolvedora ${estudio}`)
                 console.table(res.data)
             } else {
-                console.log('\nNenhum usuário possui todos os jogos dessa desenvolvedora.')
+                console.log(`\nNenhum usuário possui todos os jogos dessa desenvolvedora ${estudio}.`)
             }
         })
 
-        const placeHolder = await useQuestion('\nDigite algo para voltar')
+        const placeHolder = await useQuestion('\nEnter para voltar')
+        console.clear()
 
+    },
+    "Listar usuários pelo valor de inventário:": async () => {
+        const valor = await useQuestion('Qual é o valor mínimo de inventário?')
+
+        await axios.post('http://localhost:3001/valor-inventario', {
+            valor: valor
+        })
+        .then((res) => {
+            if(res.data.length > 0){
+                console.log(`Usuários com o inventario no valor de ${valor}`)
+                console.table(res.data)
+            } else {
+                console.log(`Nenhum usuários possui o inventario no valor de ${valor}`)
+            }
+        })
+
+        const placeHolder = await useQuestion('\nEnter para voltar')
+        console.clear()
+    },
+    "Listar jogos com seu playtime total:": async () => {
+
+        await axios.get('http://localhost:3001/jogo-tempo-total',)
+        .then((res) => {
+            console.log('\nTempo de jogo global de cada jogo:')
+            console.table(res.data)
+        })
+
+        const placeHolder = await useQuestion('\nEnter para voltar')
+        console.clear()
+    },
+    "Listar jogos nunca comprados:": async () => {
+        await axios.get('http://localhost:3001/jogo-impopular',)
+        .then((res) => {
+            console.log('\nJogos que não foram comprados nem uma vez:')
+            console.table(res.data)
+        })
+
+        const placeHolder = await useQuestion('\nEnter para voltar')
+        console.clear()
     },
     "Voltar": async () => {
         menuAtual = menuSteam

@@ -166,6 +166,7 @@ async function createTabelas(){
     await db.query(`CREATE SEQUENCE anuncio_seq START 29`)
     await db.query(`CREATE SEQUENCE comentario_seq START 4`)
     await db.query(`CREATE SEQUENCE discussao_seq START 6`)
+    await db.query(`CREATE SEQUENCE jogo_seq START 18`)
 
     console.log('Tabelas criadas.')
     await db.end()

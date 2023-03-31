@@ -267,13 +267,47 @@ app.post("/desinteresse-genero", (req, res) => {
 app.post("/fa-estudio", (req, res) => {
     const { estudio } = req.body
 
-    db.query(`select * from usuario
+    db.query(`select login, email, apelido, nome from usuario
                      where not exists (select login from biblioteca
                      natural right join publicacao
                      where estudio ILIKE $1
                      and idjogo NOT IN (select idjogo from biblioteca
                                         where login = usuario.login))`,
     [estudio], (err, result) => {
+        res.send(result.rows)
+    })
+})
+
+app.post("/valor-inventario", (req, res) => {
+    const { valor } = req.body
+
+    db.query(`select usuario.login, sum(item.preco) as valorTotal from usuario
+    natural join inventario
+    join item using (idItem)
+    group by usuario.login
+    having sum(item.preco) >= $1`,
+    [valor], (err, result) => {
+        res.send(result.rows)
+    })
+})
+
+app.get("/jogo-tempo-total", (req, res) => {
+    
+    db.query(`select jogos.nome, sum(horasjogadas) as tempoGlobal from biblioteca
+    natural right join jogos
+    group by jogos.nome
+    order by tempoGlobal`, 
+    (err, result) => {
+        res.send(result.rows)
+    })
+
+})
+
+app.get("/jogo-impopular", (req, res) => {
+    
+    db.query(`select * from jogos
+    where idjogo not in (select idjogo from biblioteca)`, 
+    (err, result) => {
         res.send(result.rows)
     })
 
@@ -473,5 +507,48 @@ app.post("/add-dev", (req, res) => {
         }
         
     })
+})
 
+// Publicar jogo
+
+app.post("/publicar-jogo", (req, res) => {
+    const { nomeJogo } = req.body
+    const { valor } = req.body
+    const { idadeMinima } = req.body
+    const { login } = req.body
+    const { generos } = req.body
+    let idJogo
+    let estudio
+
+    // Criar o jogo
+    db.query(`insert into jogos values ( nextval('jogo_seq'), $1, $2, current_timestamp, $3 )`, [nomeJogo, valor, idadeMinima])
+
+    db.query(`select last_value from jogo_seq`,
+    (err, result) => {
+        idJogo = result.rows[0].last_value
+
+        // Criar classificacao com os generos
+        generos.forEach((idGenero) => {
+            db.query(`insert into classificacao values ( $1, $2 )`, [idJogo, idGenero])
+        })
+
+    })
+
+    // Criar publicacao
+    db.query(`select nomeestudio from desenvolvedor where login = $1`, 
+    [login], (err, result) => {
+        estudio = result.rows[0].nomeestudio
+
+        db.query(`insert into publicacao values ( $1, $2 )`, [estudio, idJogo])
+    })
+
+    res.send('\n** Jogo publicado! **')
+
+})
+
+app.get("/publicar-jogo/genero", (req, res) => {
+    db.query(`select * from genero`,
+    (err, result) => {
+        res.send(result.rows)
+    })
 })
