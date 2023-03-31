@@ -329,7 +329,75 @@ const menuSteam = {
 
     },
     "Discussões": async () => {
+        // Lista TODAS as discussoes
+        // * Listar discussoes sobre meus jogos
+        // * Criar discussao
+        let listaDiscussoes
+        let idSelecionado
+        let postSelecionado
+        let postInfos
+        await axios.get('http://localhost:3001/get-discussoes')
+        .then((res) => {
+            listaDiscussoes = res.data
+            console.table(listaDiscussoes, ['idpostagem', 'titulo']) // idPostagem, login, idJogo, titulo, mensagem
+        })
 
+        const placeHolder = await useQuestion('\nDeseja entra em algum tópico? (Y/N)')
+        if(placeHolder.toUpperCase() === 'Y'){
+            do{
+                idSelecionado = await useQuestion('\nQual tópico você deseja acessar? (ID): ')
+                postSelecionado = Boolean(listaDiscussoes.find(({ idpostagem }) => idpostagem == idSelecionado))
+                postInfos = listaDiscussoes.find(({ idpostagem }) => idpostagem == idSelecionado)
+                if(!postSelecionado){
+                    console.log('\n** ID inválido. **')
+                }
+            }while(!postSelecionado)
+
+            // Listar postagem com os comentarios
+            // Titulo (ID)
+            // Mensagem
+            // user: comentario
+            console.clear()
+            console.log(`Autor: ${postInfos.login}`)
+            console.log(`Título: ${postInfos.titulo} [${postInfos.idpostagem}]`)
+            console.log(`Mensagem: ${postInfos.mensagem}\n`)
+
+            await axios.post('http://localhost:3001/get-comentarios',{
+                idPostagem: idSelecionado
+            })
+            .then((res) => {
+                if(res.data.length > 0){
+                    res.data.forEach((item) => {
+                        console.log(`${item.login}: ${item.comentario}`)
+                    })
+                } else {
+                    console.log('Ainda não há comentários para esse tópico!')
+                }
+            })
+
+            // Deseja adicionar um comentario?
+            const placeHolder = await useQuestion('\nDeseja adicionar um comentário nesse tópico? (Y/N)')
+            if(placeHolder.toUpperCase() === 'Y'){
+                const comentario = await useQuestion('\nEscreva seu comentário:')
+
+                await axios.post('http://localhost:3001/add-comentario', {
+                    comentario: comentario,
+                    login: login,
+                    idPostagem: idSelecionado
+                })
+                .then((res) => {
+                    console.clear()
+                    console.log(res.data)
+                })
+            } else {
+                console.clear()
+            }
+        } else {
+            // menus
+            menuAtual = menuDiscussoes
+        }
+        //const voltar = await useQuestion('\nEnter para voltar')
+        //console.clear()
     },
     "Virar desenvolvedor": async () => {
 
@@ -345,6 +413,18 @@ const menuSteam = {
         dev = false
         listaCarrinho = null
         menuAtual = menuInicial
+    }
+}
+
+const menuDiscussoes = {
+    "Listar discussões dos meus jogos": async () => {
+
+    },
+    "Criar uma discussão": async () => {
+
+    },
+    "Voltar": async () => {
+        menuAtual = menuSteam
     }
 }
 
@@ -457,7 +537,7 @@ const menuLoja = {
             idSelecionado = await useQuestion('\nQual jogo você deseja adicionar ao carrinho? (ID): ')
             jogoSelecionado = Boolean(listaJogos.find(({ idjogo }) => idjogo == idSelecionado))
             if(!jogoSelecionado){
-                console.log('\nID inválido.')
+                console.log('\n** ID inválido. **')
             }
         }while(!jogoSelecionado)
         

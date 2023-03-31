@@ -15,7 +15,6 @@ app.listen(3001, () => {
 // Janela de login
 
 app.post("/login", (req, res) => {
-
     const { email } = req.body
     const { senha } = req.body
 
@@ -41,7 +40,6 @@ app.post("/login", (req, res) => {
 })
 
 app.post("/registrar", (req, res) => {
-
     const { login } = req.body
     const { email } = req.body
     const { senha } = req.body
@@ -67,7 +65,6 @@ app.post("/registrar", (req, res) => {
 // Perfil
 
 app.post("/perfil", (req, res) => {
-    
     const { login } = req.body
 
     db.query('SELECT * FROM usuario WHERE login = $1',
@@ -77,7 +74,6 @@ app.post("/perfil", (req, res) => {
 })
 
 app.post("/alterar-informacoes", (req, res) => {
-
     const { login } = req.body
     const { novoApelido } = req.body
     const { novoNome } = req.body
@@ -111,7 +107,6 @@ app.post("/alterar-informacoes", (req, res) => {
 // Loja
 
 app.post("/loja", (req, res) => {
-
     const { nome } = req.body
     const { genero } = req.body
 
@@ -270,7 +265,6 @@ app.post("/desinteresse-genero", (req, res) => {
 })
 
 app.post("/fa-estudio", (req, res) => {
-
     const { estudio } = req.body
 
     db.query(`select * from usuario
@@ -387,14 +381,38 @@ app.post("/mercado-comunidade/item", (req, res) => {
     })
 })
 
-// Publicações
+// Discussões
 
+app.get("/get-discussoes", (req, res) => {
+    db.query(`select * from discussoes order by titulo`,
+    (err, result) => {
+        res.send(result.rows)
+    })
+})
 
+app.post("/get-comentarios", (req, res) => {
+    const { idPostagem } = req.body
+
+    db.query(`select * from comentario where idpostagem = $1`, 
+    [idPostagem], (err, result) => {
+        res.send(result.rows)
+    })
+})
+
+app.post("/add-comentario", (req, res) => {
+    const { idPostagem } = req.body
+    const { login } = req.body
+    const { comentario } = req.body
+
+    db.query(`insert into comentario values ( nextval('comentario_seq'), $1, $2, $3 )`, 
+    [idPostagem, login, comentario], () => {
+        res.send('\n** Comentário publicado! **')
+    })
+})
 
 // Historico de compras
 
 app.post("/meus-pedidos", (req, res) => {
-
     const { login } = req.body
 
     db.query(`select idpedido, to_char(data, 'DD/MM/YYYY') as data, precototal from pedido where login = $1`,
@@ -404,7 +422,6 @@ app.post("/meus-pedidos", (req, res) => {
 })
 
 app.post("/meus-pedidos/conteudo", (req, res) => {
-
     const { idPedido } = req.body
 
     db.query(`select idpedido, jogos.nome, jogos.preco from pedido_conteudo
