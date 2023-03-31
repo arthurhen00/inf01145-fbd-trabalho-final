@@ -198,7 +198,6 @@ const menuSteam = {
                         infoItem: infoItem
                     })
                     .then((res) => {
-                        
                         console.log(res.data)
                     })
 
@@ -210,13 +209,76 @@ const menuSteam = {
         })
     },
     "Mercado da comunidade": async () => {
-        
+        let idSelecionado
+        let itemSelecionado
+        let listaMercado
+        let listaItens
+        let saldo
+        let precoAnuncio
+        let anunciante
         await axios.get('http://localhost:3001/mercado-comunidade')
         .then((res) => {
-            console.table(res.data)
+            listaMercado = res.data
+            console.table(listaMercado)
         })
 
         const placeHolder = await useQuestion('\nDeseja comprar um item? (Y/N)')
+        if(placeHolder.toUpperCase() === 'Y'){
+            do{
+                idSelecionado = await useQuestion('\nSelecione o item: (ID)')
+                itemSelecionado = Boolean(listaMercado.find(({ iditem }) => iditem == idSelecionado))
+                if(!itemSelecionado){
+                    console.log('\n** Esse item nao está anunciado no mercado! **.')
+                }
+            }while(!itemSelecionado)
+
+            await axios.post('http://localhost:3001/mercado-comunidade/item', {
+                idItem: idSelecionado
+            })
+            .then((res) => {
+                console.clear()
+                listaItens = res.data
+                console.log(`\nJogo: [${listaItens[0].jogo_do_item}]\nItem: [${listaItens[0].nome_item}]\nID item: [${listaItens[0].iditem}]`)
+                console.log('Descrição: ' + listaItens[0].descricao + '\n')
+
+                console.table(listaItens, ['idanuncio', 'anunciante', 'preco_anuncio'])
+            })
+
+            do{
+                idSelecionado = await useQuestion('\nSelecione qual anuncio você deseja comprar: (ID)')
+                itemSelecionado = Boolean(listaItens.find(({ idanuncio }) => idanuncio == idSelecionado))
+                precoAnuncio = listaItens.find(({ idanuncio }) => idanuncio == idSelecionado).preco_anuncio
+                anunciante = listaItens.find(({ idanuncio }) => idanuncio == idSelecionado).anunciante
+                if(!itemSelecionado){
+                    console.log('\n** Não existe esse anúncio! **.')
+                }
+            }while(!itemSelecionado)
+
+            // verificar saldo
+            await axios.post('http://localhost:3001/get-saldo', {
+                login: login
+            })
+            .then((res) => {
+                saldo = res.data[0].saldo
+            })
+
+            console.clear()
+
+            if(precoAnuncio > saldo) {
+                console.log(`** Você nao possui saldo para comprar esse anúncio | Saldo: ${saldo} | Preço anúncio: ${precoAnuncio} | **`)
+            } else {
+                await axios.post('http://localhost:3001/compra-mercado', {
+                    comprador: login,
+                    anunciante: anunciante,
+                    valor: precoAnuncio,
+                    idAnuncio: idSelecionado,
+                    idItem: listaItens[0].iditem
+                })
+                .then((res) => {
+                    console.log(res.data)
+                })
+            }
+        }
     },
     "Histórico de compras": async () => {
         /**

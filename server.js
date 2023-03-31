@@ -347,7 +347,44 @@ app.get("/mercado-comunidade", (req, res) => {
     (err, result) => {
         res.send(result.rows)
     })
+})
 
+app.post("/compra-mercado", (req, res) => {
+    const { comprador } = req.body
+    const { anunciante } = req.body
+    const { valor } = req.body
+    const { idAnuncio } = req.body
+    const { idItem } = req.body
+
+    // Atualiza saldo do comprador
+    db.query(`update usuario set saldo = saldo - $1 where login = $2`, [valor, comprador])
+    
+    // Atualiza saldo do anunciante
+    db.query(`update usuario set saldo = saldo + $1 where login = $2`, [valor, anunciante])
+    
+    // adiciona item ao inventario do comprador
+    db.query(`insert into inventario values ( $1, $2 )`, [comprador, idItem])
+    
+    // remove item do inventario do anunciante
+    //db.query(`delete from inventario where login = $1 and iditem = $2`, [anunciante, idItem])
+    // Já é retirado no momento da criacao do anuncio 'gatilho'
+    
+    // remove anuncio
+    db.query(`delete from mercado where login = $1 and idanuncio = $2`, [anunciante, idAnuncio])
+
+    res.send('** Transação concluida! **')
+
+})
+
+app.post("/mercado-comunidade/item", (req, res) => {
+    const { idItem } = req.body
+    
+    // Listagem de itens selecionados
+    db.query(`select iditem, jogo_do_item, nome_item, descricao, idanuncio, anunciante, preco_anuncio from mercado_item_jogo
+            where iditem = $1`, 
+    [idItem], (err, result) => {
+        res.send(result.rows)
+    })
 })
 
 // Publicações
