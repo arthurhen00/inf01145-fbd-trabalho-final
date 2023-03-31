@@ -457,3 +457,21 @@ app.post("/meus-pedidos/conteudo", (req, res) => {
         res.send(result.rows)
     })
 })
+
+app.post("/add-dev", (req, res) => {
+    const { login } = req.body
+    const { estudio } = req.body
+    const { cpf } = req.body
+
+    db.query(`insert into desenvolvedor values ( $1, $2, $3 )`, [login, estudio, cpf],
+    (err, result) => {
+        console.log(err)
+        if(!err){
+            res.send(true)
+        } else {
+            res.send(false)
+        }
+        
+    })
+
+})

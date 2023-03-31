@@ -400,6 +400,23 @@ const menuSteam = {
         //console.clear()
     },
     "Virar desenvolvedor": async () => {
+        const estudio = await useQuestion('\nEscreva o nome do estudio:')
+        const cpf = await useQuestion('\nEscreva seu cpf: (11 números)')
+
+        await axios.post('http://localhost:3001/add-dev', {
+            login: login,
+            estudio: estudio,
+            cpf: cpf
+        })
+        .then((res) => {
+            console.clear()
+            if(res.data){
+                console.log(`** Você virou desenvolvedor do estudio ${estudio} **`)
+                dev = true
+            } else {
+                console.log('\n** Nome do estudio ou cpf já estão em uso **')
+            }
+        })
 
     },
     "Menu de desenvolvedor": async () => {
