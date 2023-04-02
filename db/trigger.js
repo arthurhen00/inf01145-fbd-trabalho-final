@@ -32,7 +32,7 @@ async function createTriggers(){
         where nomeestudio = new.estudio;
         
         insert into discussoes values
-        (DEFAULT, concat('Nós da ',nome_estudio, ' publicamos um novo jogo!'), 'Venha conferir nosso novo jogo e utilize esse topico para reviews', dono_estudio, new.idjogo);
+        (nextval('discussao_seq'), concat('Nós da ',nome_estudio, ' publicamos um novo jogo!'), 'Venha conferir nosso novo jogo e utilize esse topico para reviews', dono_estudio, new.idjogo);
         return null;
     end;$$`)
 
